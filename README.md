@@ -55,6 +55,16 @@ cp backend/.env.example backend/.env      # then edit it: password, a 32+ charac
 The tables, three sample rooms and their LKR rates are created automatically on first start (Flyway).
 </details>
 
+### Troubleshooting
+| What you see | Why, and what to do |
+|---|---|
+| The site says it **cannot reach the server**, or the terminal shows `ECONNREFUSED` for `/api/...` | The website is running but the backend is not. Start it with `./run-backend.sh` (or use `./dev.sh`, which starts both) and wait for `Started HotelManagementApplication`. |
+| `Port 8080 was already in use` | An old backend is still running. Stop it with `lsof -ti:8080 \| xargs kill`, then start again. |
+| `Port 5173 is already in use` | An old website server is running. Stop it with `lsof -ti:5173 \| xargs kill`. The port is fixed because the backend only accepts requests from that address. |
+| The backend stops with a **database error** | PostgreSQL is not running. On a Mac with Homebrew, check with `brew services list \| grep postgres`. |
+| The backend says `JWT_SECRET` is missing | `backend/.env` was not loaded. Use `./run-backend.sh`, or run `./scripts/setup-local.sh` first if the file does not exist. |
+| **Too many failed attempts** when logging in | Five wrong passwords lock an account for 15 minutes. Wait, or restart the backend (the lockout is kept in memory). |
+
 ## Online payments (PayHere)
 
 Guests pay on **PayHere's own secure page**, so card details never touch this site. PayHere is a Sri Lankan payment gateway
