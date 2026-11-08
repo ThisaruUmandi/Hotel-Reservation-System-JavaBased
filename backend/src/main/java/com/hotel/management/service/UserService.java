@@ -30,4 +30,12 @@ public class UserService {
     }
 
     public Optional<User> find(Long id) { return users.findById(id); }
+
+    public void changePassword(Long userId, String currentPassword, String newPassword) {
+        User user = users.findById(userId).orElseThrow(() -> new com.hotel.management.exception.ResourceNotFoundException("User not found"));
+        if (!encoder.matches(currentPassword, user.getPasswordHash()))
+            throw new IllegalArgumentException("Your current password is not correct");
+        user.setPasswordHash(encoder.encode(newPassword));
+        users.save(user);
+    }
 }

@@ -25,7 +25,7 @@ class BookingApiTest extends ApiTestBase {
                         .contentType(MediaType.APPLICATION_JSON).content(bookingJson(room("102").getId(), 2, in, out)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.nights").value(3))
-                .andExpect(jsonPath("$.totalPrice").value(360.0))
+                .andExpect(jsonPath("$.totalPrice").value(room("102").getPricePerNight().multiply(java.math.BigDecimal.valueOf(3)).doubleValue()))
                 .andExpect(jsonPath("$.status").value("CONFIRMED"));
     }
 
@@ -151,5 +151,43 @@ class BookingApiTest extends ApiTestBase {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.count").value(1))
                 .andExpect(jsonPath("$.averageRating").value(4.0));
+    }
+
+    @Test
+    void reservationsReportWhetherTheyHaveBeenReviewed() throws Exception {
+        User alice = userWithGuest("alice");
+        Room r = room("201");
+        Reservation finished = reservations.save(new Reservation(alice.getGuest(), r,
+                LocalDate.now().minusDays(5), LocalDate.now().minusDays(2), 1));
+
+        mvc.perform(get("/api/reservations/" + finished.getId()).header("Authorization", bearer(alice)))
+                .andExpect(jsonPath("$.reviewed").value(false));
+        mvc.perform(post("/api/reviews").header("Authorization", bearer(alice)).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"reservationId\":" + finished.getId() + ",\"rating\":5,\"comment\":\"Lovely\"}")).andExpect(status().isCreated());
+        mvc.perform(get("/api/reservations/" + finished.getId()).header("Authorization", bearer(alice)))
+                .andExpect(jsonPath("$.reviewed").value(true));
+        mvc.perform(get("/api/reservations/mine").header("Authorization", bearer(alice)))
+                .andExpect(jsonPath("$[0].reviewed").value(true));
+    }
+
+    @Test
+    void ratesAreInRupees() throws Exception {
+        // Seed rates from migration V4. A night in the cheapest room should be a plausible LKR amount.
+        mvc.perform(get("/api/rooms/" + room("101").getId()))
+                .andExpect(jsonPath("$.pricePerNight").value(12000.0));
+    }
+
+    @Test
+    void publicReviewsShowOnlyFirstNameAndInitial() throws Exception {
+        User dana = newUser("dana", Role.GUEST);
+        dana.setGuest(guests.save(new Guest("Dana Wickramasinghe", "dana@example.com", null)));
+        users.save(dana);
+        Reservation finished = reservations.save(new Reservation(dana.getGuest(), room("201"),
+                LocalDate.now().minusDays(5), LocalDate.now().minusDays(2), 1));
+        mvc.perform(post("/api/reviews").header("Authorization", bearer(dana)).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"reservationId\":" + finished.getId() + ",\"rating\":5,\"comment\":\"Great\"}")).andExpect(status().isCreated())
+                .andExpect(jsonPath("$.guestName").value("Dana W."));
+        mvc.perform(get("/api/rooms/" + room("201").getId() + "/reviews"))
+                .andExpect(jsonPath("$.reviews[0].guestName").value("Dana W."));
     }
 }

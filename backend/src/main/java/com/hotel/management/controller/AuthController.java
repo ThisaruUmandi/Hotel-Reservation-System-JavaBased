@@ -38,6 +38,12 @@ public class AuthController {
                 .orElse(ResponseEntity.status(401).body(ErrorResponse.of(401, "Invalid username or password")));
     }
 
+    @PostMapping("/change-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changePassword(@Valid @RequestBody ChangePasswordRequest r, @AuthenticationPrincipal AuthenticatedUser actor) {
+        users.changePassword(actor.id(), r.currentPassword(), r.newPassword());
+    }
+
     @GetMapping("/me")
     public UserResponse me(@AuthenticationPrincipal AuthenticatedUser actor) {
         return users.find(actor.id()).map(mapper::toResponse)

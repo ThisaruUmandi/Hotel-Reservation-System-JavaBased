@@ -15,8 +15,10 @@ describe('room helpers', () => {
     expect(roomImage(room(1, 'SUITE', 250))).toBe('/images/rooms/suite.jpg');
   });
 
-  it('formats prices without decimals', () => {
-    expect(formatPrice(120)).toBe('$120');
+  it('formats prices in rupees with thousands separators', () => {
+    expect(formatPrice(120)).toBe('LKR 120');
+    expect(formatPrice(18500)).toBe('LKR 18,500');
+    expect(formatPrice(1250000)).toBe('LKR 1,250,000');
   });
 
   it('keeps the cheapest room of each type', () => {

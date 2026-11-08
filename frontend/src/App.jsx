@@ -1,10 +1,12 @@
 import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import Account from './pages/Account';
 import Book from './pages/Book';
 import BookingDetail from './pages/BookingDetail';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import MyBookings from './pages/MyBookings';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
 import RoomDetail from './pages/RoomDetail';
@@ -18,6 +20,8 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/book/:id" element={<ProtectedRoute><Book /></ProtectedRoute>} />
+        <Route path="/bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
+        <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
         <Route path="/bookings/:id" element={<ProtectedRoute><BookingDetail /></ProtectedRoute>} />
         <Route path="/rooms" element={<Rooms />} />
         <Route path="/rooms/:id" element={<RoomDetail />} />

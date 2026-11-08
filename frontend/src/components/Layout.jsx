@@ -50,7 +50,7 @@ export default function Layout() {
             <div className="nav__actions">
               {user ? (
                 <>
-                  <span className="nav__user">{user.username}</span>
+                  <Link to="/account" className="nav__user">{user.username}</Link>
                   <button type="button" className="btn btn--ghost btn--small" onClick={logout}>Log out</button>
                 </>
               ) : (

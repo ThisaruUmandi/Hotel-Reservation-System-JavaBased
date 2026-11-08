@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class ReservationService {
@@ -20,11 +22,13 @@ public class ReservationService {
     private final PaymentRepository payments;
     private final UserRepository users;
     private final ReservationAccess access;
+    private final ReviewRepository reviews;
 
     public ReservationService(ReservationRepository reservations, RoomRepository rooms, GuestRepository guests,
-                              PaymentRepository payments, UserRepository users, ReservationAccess access) {
+                              PaymentRepository payments, UserRepository users, ReservationAccess access,
+                              ReviewRepository reviews) {
         this.reservations = reservations; this.rooms = rooms; this.guests = guests;
-        this.payments = payments; this.users = users; this.access = access;
+        this.payments = payments; this.users = users; this.access = access; this.reviews = reviews;
     }
 
     /** Staff only (enforced in SecurityConfig). */
@@ -37,6 +41,14 @@ public class ReservationService {
     }
 
     public Reservation get(Long id, AuthenticatedUser actor) { return access.load(id, actor); }
+
+    public boolean isReviewed(Long reservationId) { return reviews.existsByReservationId(reservationId); }
+
+    /** Which of these reservations already have a review, in a single query. */
+    public Set<Long> reviewedIds(Collection<Reservation> list) {
+        if (list.isEmpty()) return Set.of();
+        return reviews.findReviewedReservationIds(list.stream().map(Reservation::getId).toList());
+    }
 
     @Transactional
     public Reservation create(AuthenticatedUser actor, Long roomId, Guest details, int numberOfGuests,

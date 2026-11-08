@@ -31,3 +31,15 @@ export const formatDay = (iso) => dayFormat.format(parseISODate(iso));
 
 const longFormat = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 export const formatLong = (iso) => longFormat.format(parseISODate(iso));
+
+const monthShort = new Intl.DateTimeFormat('en-GB', { month: 'short' });
+/** "8-11 Dec 2026", or "29 Dec 2026 - 2 Jan 2027" when the stay crosses a month or year. */
+export function formatRange(checkIn, checkOut) {
+  const a = parseISODate(checkIn);
+  const b = parseISODate(checkOut);
+  const left = `${a.getDate()} ${monthShort.format(a)}`;
+  const right = `${b.getDate()} ${monthShort.format(b)}`;
+  if (a.getFullYear() !== b.getFullYear()) return `${left} ${a.getFullYear()} to ${right} ${b.getFullYear()}`;
+  if (a.getMonth() !== b.getMonth()) return `${left} to ${right} ${b.getFullYear()}`;
+  return `${a.getDate()} to ${right} ${b.getFullYear()}`;
+}

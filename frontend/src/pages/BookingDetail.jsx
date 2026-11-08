@@ -3,8 +3,10 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import { paymentsApi } from '../api/payments';
 import { reservationsApi } from '../api/reservations';
 import { site } from '../config/site';
+import ReviewForm from '../components/ReviewForm';
 import { bookingRef } from '../lib/booking';
-import { formatLong, todayISO } from '../lib/dates';
+import { canCancel, canReview } from '../lib/bookings';
+import { formatLong } from '../lib/dates';
 import { formatPrice, typeLabel } from '../lib/rooms';
 
 const STATUS = { CONFIRMED: 'Confirmed', CANCELLED: 'Cancelled', COMPLETED: 'Completed' };
@@ -60,7 +62,6 @@ export default function BookingDetail() {
   const paid = payments.find((p) => p.status === 'PAID');
   const refunded = payments.find((p) => p.status === 'REFUNDED');
   const cancelled = booking.status === 'CANCELLED';
-  const canCancel = booking.status === 'CONFIRMED' && booking.checkIn > todayISO();
   const justBooked = state?.justBooked && !cancelled;
 
   let paymentText = 'Pay at the front desk when you arrive.';
@@ -106,8 +107,11 @@ export default function BookingDetail() {
 
         {actionError && <p className="alert alert--error" role="alert">{actionError}</p>}
 
+        {canReview(booking) && <ReviewForm reservationId={booking.id} onDone={load} />}
+        {booking.reviewed && <p className="alert alert--success" role="status">Thank you. You have reviewed this stay.</p>}
+
         <div className="confirm__actions">
-          {canCancel && !confirming && <button type="button" className="btn btn--ghost" onClick={() => setConfirming(true)}>Cancel booking</button>}
+          {canCancel(booking) && !confirming && <button type="button" className="btn btn--ghost" onClick={() => setConfirming(true)}>Cancel booking</button>}
           {confirming && (
             <div className="confirm__cancel" role="alertdialog" aria-label="Confirm cancellation">
               <p><strong>Cancel this booking?</strong> {paid ? 'Your card payment will be refunded.' : 'You will not be charged.'}</p>
@@ -117,7 +121,8 @@ export default function BookingDetail() {
               </div>
             </div>
           )}
-          <Link to="/rooms" className="text-link">Browse more rooms</Link>
+          <Link to="/bookings" className="text-link">All my bookings</Link>
+          <Link to="/rooms" className="text-link">Browse rooms</Link>
         </div>
       </div>
     </section>

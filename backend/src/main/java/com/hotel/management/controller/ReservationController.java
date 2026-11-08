@@ -25,16 +25,17 @@ public class ReservationController {
 
     /** All reservations: staff and admin only. */
     @GetMapping
-    public List<ReservationResponse> all() { return service.findAll().stream().map(mapper::toResponse).toList(); }
+    public List<ReservationResponse> all() { return withReviewFlags(service.findAll()); }
 
     @GetMapping("/mine")
     public List<ReservationResponse> mine(@AuthenticationPrincipal AuthenticatedUser actor) {
-        return service.findMine(actor).stream().map(mapper::toResponse).toList();
+        return withReviewFlags(service.findMine(actor));
     }
 
     @GetMapping("/{id}")
     public ReservationResponse one(@PathVariable Long id, @AuthenticationPrincipal AuthenticatedUser actor) {
-        return mapper.toResponse(service.get(id, actor));
+        var reservation = service.get(id, actor);
+        return mapper.toResponse(reservation, service.isReviewed(reservation.getId()));
     }
 
     @PostMapping
@@ -42,11 +43,16 @@ public class ReservationController {
     public ReservationResponse create(@Valid @RequestBody BookingRequest b,
                                       @AuthenticationPrincipal AuthenticatedUser actor) {
         Guest details = new Guest(b.name(), b.email(), b.phone());
-        return mapper.toResponse(service.create(actor, b.roomId(), details, b.guests(), b.checkIn(), b.checkOut()));
+        return mapper.toResponse(service.create(actor, b.roomId(), details, b.guests(), b.checkIn(), b.checkOut()), false);
     }
 
     @DeleteMapping("/{id}")
     public ReservationResponse cancel(@PathVariable Long id, @AuthenticationPrincipal AuthenticatedUser actor) {
-        return mapper.toResponse(service.cancel(id, actor));
+        return mapper.toResponse(service.cancel(id, actor), false); // a cancelled stay cannot be reviewed
+    }
+
+    private List<ReservationResponse> withReviewFlags(List<com.hotel.management.model.Reservation> list) {
+        var reviewed = service.reviewedIds(list);
+        return list.stream().map(r -> mapper.toResponse(r, reviewed.contains(r.getId()))).toList();
     }
 }

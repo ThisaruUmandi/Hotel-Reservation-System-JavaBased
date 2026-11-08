@@ -115,6 +115,32 @@ class SecurityApiTest extends ApiTestBase {
     }
 
     @Test
+    void changingPasswordRequiresTheCurrentOne() throws Exception {
+        String register = "{\"username\":\"dana\",\"password\":\"password123\"}";
+        String body = mvc.perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON).content(register))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        String token = "Bearer " + com.jayway.jsonpath.JsonPath.read(body, "$.token");
+
+        mvc.perform(post("/api/auth/change-password").header("Authorization", token).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"currentPassword\":\"not-it\",\"newPassword\":\"brandnew456\"}")).andExpect(status().isBadRequest());
+        mvc.perform(post("/api/auth/change-password").header("Authorization", token).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"currentPassword\":\"password123\",\"newPassword\":\"short\"}"))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.fieldErrors.newPassword").exists());
+        mvc.perform(post("/api/auth/change-password").header("Authorization", token).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"currentPassword\":\"password123\",\"newPassword\":\"brandnew456\"}")).andExpect(status().isNoContent());
+
+        mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON).content(register)).andExpect(status().isUnauthorized());
+        mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"dana\",\"password\":\"brandnew456\"}")).andExpect(status().isOk());
+    }
+
+    @Test
+    void changingPasswordNeedsLogin() throws Exception {
+        mvc.perform(post("/api/auth/change-password").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"currentPassword\":\"a\",\"newPassword\":\"brandnew456\"}")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void weakCredentialsAreRejected() throws Exception {
         mvc.perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON)
                 .content("{\"username\":\"ab\",\"password\":\"short\"}"))

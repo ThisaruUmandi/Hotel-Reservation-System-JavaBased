@@ -28,6 +28,7 @@ public class User {
     public Long getId() { return id; }
     public String getUsername() { return username; }
     public String getPasswordHash() { return passwordHash; }
+    public void setPasswordHash(String v) { this.passwordHash = v; }
     public Role getRole() { return role; }
     public void setRole(Role v) { this.role = v; }
     public Guest getGuest() { return guest; }

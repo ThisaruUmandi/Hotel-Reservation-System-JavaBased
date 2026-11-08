@@ -26,10 +26,10 @@ public class EntityMapper {
         return new GuestResponse(g.getId(), g.getName(), g.getEmail(), g.getPhone());
     }
 
-    public ReservationResponse toResponse(Reservation r) {
+    public ReservationResponse toResponse(Reservation r, boolean reviewed) {
         return new ReservationResponse(r.getId(), toResponse(r.getGuest()), toResponse(r.getRoom()),
                 r.getCheckIn(), r.getCheckOut(), r.nights(), r.getNumberOfGuests(), r.getTotalPrice(),
-                r.getStatus().name(), r.getCreatedAt());
+                r.getStatus().name(), reviewed, r.getCreatedAt());
     }
 
     public UserResponse toResponse(User u) {
@@ -43,6 +43,13 @@ public class EntityMapper {
     }
 
     public ReviewResponse toResponse(Review r) {
-        return new ReviewResponse(r.getId(), r.getGuest().getName(), r.getRating(), r.getComment(), r.getCreatedAt());
+        return new ReviewResponse(r.getId(), publicName(r.getGuest().getName()), r.getRating(), r.getComment(), r.getCreatedAt());
+    }
+
+    /** Reviews are public, so show "Nadia P." rather than a full name. */
+    static String publicName(String fullName) {
+        String[] parts = fullName.trim().split("\\s+");
+        if (parts.length < 2) return parts[0];
+        return parts[0] + " " + Character.toUpperCase(parts[parts.length - 1].charAt(0)) + ".";
     }
 }

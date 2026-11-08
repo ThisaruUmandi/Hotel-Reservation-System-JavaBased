@@ -11,8 +11,9 @@ export function roomImage(room) {
   return room.imageUrl ?? `/images/rooms/${room.type.name.toLowerCase()}.jpg`;
 }
 
-const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
-export const formatPrice = (amount) => money.format(amount);
+// Prices are in Sri Lankan rupees. Written out as "LKR 18,500" so it reads the same in every browser.
+const grouped = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+export const formatPrice = (amount) => `LKR ${grouped.format(amount)}`;
 
 /** One room per room type, cheapest first. Used to show a varied selection. */
 export function onePerType(rooms) {

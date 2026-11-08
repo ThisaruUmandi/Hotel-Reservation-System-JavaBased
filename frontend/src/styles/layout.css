@@ -17,7 +17,8 @@
 .nav__link:hover { color: var(--ink); }
 .nav__link.active { color: var(--ink); border-bottom-color: var(--ink); }
 .nav__actions { display: flex; align-items: center; gap: var(--space-4); }
-.nav__user { font-size: 0.9rem; color: var(--muted); }
+.nav__user { font-size: 0.9rem; color: var(--muted); text-decoration: none; }
+.nav__user:hover { color: var(--ink); text-decoration: underline; }
 
 .nav-toggle { display: none; width: 46px; height: 46px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); background: transparent; color: var(--ink); cursor: pointer; }
 .nav-toggle svg { margin: auto; }
