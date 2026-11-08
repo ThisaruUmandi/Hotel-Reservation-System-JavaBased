@@ -44,6 +44,14 @@ public class ReservationService {
 
     public boolean isReviewed(Long reservationId) { return reviews.existsByReservationId(reservationId); }
 
+    public boolean isPaid(Long reservationId) { return payments.existsByReservationIdAndStatus(reservationId, PaymentStatus.PAID); }
+
+    /** Which of these reservations have been paid, in a single query. */
+    public Set<Long> paidIds(Collection<Reservation> list) {
+        if (list.isEmpty()) return Set.of();
+        return payments.findPaidReservationIds(list.stream().map(Reservation::getId).toList());
+    }
+
     /** Which of these reservations already have a review, in a single query. */
     public Set<Long> reviewedIds(Collection<Reservation> list) {
         if (list.isEmpty()) return Set.of();

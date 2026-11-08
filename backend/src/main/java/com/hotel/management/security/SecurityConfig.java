@@ -1,5 +1,6 @@
 package com.hotel.management.security;
 
+import com.hotel.management.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +25,7 @@ import java.util.List;
 public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http, JwtService jwt, JsonAuthErrorHandlers errors) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http, JwtService jwt, UserRepository users, JsonAuthErrorHandlers errors) throws Exception {
         http.csrf(csrf -> csrf.disable())   // stateless API using bearer tokens, no cookies
             .cors(Customizer.withDefaults())
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -35,9 +36,11 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/rooms", "/api/rooms/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/reservations").hasAnyRole("STAFF", "ADMIN")
+                .requestMatchers("/api/admin/users", "/api/admin/users/**").hasRole("ADMIN")
+                .requestMatchers("/api/admin/**").hasAnyRole("STAFF", "ADMIN")
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().denyAll())
-            .addFilterBefore(new JwtAuthFilter(jwt), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(new JwtAuthFilter(jwt, users), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

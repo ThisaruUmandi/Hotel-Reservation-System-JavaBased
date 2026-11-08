@@ -73,4 +73,13 @@ describe('api client', () => {
     fetch.mockReturnValue(respond(204));
     expect(await api.delete('/x')).toBeNull();
   });
+
+  it('sends PATCH requests with a JSON body', async () => {
+    fetch.mockReturnValue(respond(200, { status: 'MAINTENANCE' }));
+    await api.patch('/admin/rooms/2', { status: 'MAINTENANCE' });
+    const [url, options] = fetch.mock.calls[0];
+    expect(url).toBe('/api/admin/rooms/2');
+    expect(options.method).toBe('PATCH');
+    expect(options.body).toBe('{"status":"MAINTENANCE"}');
+  });
 });

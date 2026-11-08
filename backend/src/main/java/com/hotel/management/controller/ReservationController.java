@@ -35,7 +35,7 @@ public class ReservationController {
     @GetMapping("/{id}")
     public ReservationResponse one(@PathVariable Long id, @AuthenticationPrincipal AuthenticatedUser actor) {
         var reservation = service.get(id, actor);
-        return mapper.toResponse(reservation, service.isReviewed(reservation.getId()));
+        return mapper.toResponse(reservation, service.isReviewed(reservation.getId()), service.isPaid(reservation.getId()));
     }
 
     @PostMapping
@@ -43,16 +43,17 @@ public class ReservationController {
     public ReservationResponse create(@Valid @RequestBody BookingRequest b,
                                       @AuthenticationPrincipal AuthenticatedUser actor) {
         Guest details = new Guest(b.name(), b.email(), b.phone());
-        return mapper.toResponse(service.create(actor, b.roomId(), details, b.guests(), b.checkIn(), b.checkOut()), false);
+        return mapper.toResponse(service.create(actor, b.roomId(), details, b.guests(), b.checkIn(), b.checkOut()), false, false);
     }
 
     @DeleteMapping("/{id}")
     public ReservationResponse cancel(@PathVariable Long id, @AuthenticationPrincipal AuthenticatedUser actor) {
-        return mapper.toResponse(service.cancel(id, actor), false); // a cancelled stay cannot be reviewed
+        return mapper.toResponse(service.cancel(id, actor), false, false); // a cancelled stay is neither reviewed nor paid (it is refunded)
     }
 
     private List<ReservationResponse> withReviewFlags(List<com.hotel.management.model.Reservation> list) {
         var reviewed = service.reviewedIds(list);
-        return list.stream().map(r -> mapper.toResponse(r, reviewed.contains(r.getId()))).toList();
+        var paid = service.paidIds(list);
+        return list.stream().map(r -> mapper.toResponse(r, reviewed.contains(r.getId()), paid.contains(r.getId()))).toList();
     }
 }

@@ -26,10 +26,10 @@ public class EntityMapper {
         return new GuestResponse(g.getId(), g.getName(), g.getEmail(), g.getPhone());
     }
 
-    public ReservationResponse toResponse(Reservation r, boolean reviewed) {
+    public ReservationResponse toResponse(Reservation r, boolean reviewed, boolean paid) {
         return new ReservationResponse(r.getId(), toResponse(r.getGuest()), toResponse(r.getRoom()),
                 r.getCheckIn(), r.getCheckOut(), r.nights(), r.getNumberOfGuests(), r.getTotalPrice(),
-                r.getStatus().name(), reviewed, r.getCreatedAt());
+                r.getStatus().name(), reviewed, paid, r.getCreatedAt());
     }
 
     public UserResponse toResponse(User u) {

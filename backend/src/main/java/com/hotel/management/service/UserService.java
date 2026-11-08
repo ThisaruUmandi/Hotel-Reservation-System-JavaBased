@@ -7,6 +7,7 @@ import com.hotel.management.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,6 +28,22 @@ public class UserService {
     public Optional<User> login(String username, String password) {
         return users.findByUsername(username)
                 .filter(u -> encoder.matches(password, u.getPasswordHash()));
+    }
+
+    public List<User> findAll() { return users.findAll(); }
+
+    /** Admins create staff accounts. Guests register themselves, so only STAFF or ADMIN is allowed here. */
+    public User createPrivileged(String username, String password, Role role) {
+        if (role == Role.GUEST) throw new IllegalArgumentException("Guests register themselves. Choose STAFF or ADMIN.");
+        if (users.findByUsername(username).isPresent()) throw new ConflictException("Username already taken");
+        return users.save(new User(username, encoder.encode(password), role));
+    }
+
+    public User changeRole(Long id, Role role, Long actorId) {
+        if (id.equals(actorId)) throw new IllegalArgumentException("You cannot change your own role");
+        User user = users.findById(id).orElseThrow(() -> new com.hotel.management.exception.ResourceNotFoundException("User not found"));
+        user.setRole(role);
+        return users.save(user);
     }
 
     public Optional<User> find(Long id) { return users.findById(id); }
