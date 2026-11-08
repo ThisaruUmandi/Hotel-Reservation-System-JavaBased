@@ -1,6 +1,7 @@
 package com.hotel.management.service;
 
 import com.hotel.management.dto.AdminSummaryResponse;
+import com.hotel.management.model.PaymentStatus;
 import com.hotel.management.model.ReservationStatus;
 import com.hotel.management.repository.PaymentRepository;
 import com.hotel.management.repository.ReservationRepository;
@@ -27,6 +28,7 @@ public class DashboardService {
                 reservations.countInHouse(today),
                 rooms.count(),
                 reservations.countAwaitingPayment(today),
+                payments.countByStatus(PaymentStatus.REFUND_PENDING),
                 payments.totalPaid());
     }
 }

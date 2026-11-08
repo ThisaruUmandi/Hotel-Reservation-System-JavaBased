@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { paymentsApi } from '../api/payments';
+import { postForm } from '../lib/gateway';
 import { reservationsApi } from '../api/reservations';
 import { roomsApi } from '../api/rooms';
 import { useAuth } from '../auth/AuthContext';
@@ -38,7 +39,8 @@ export default function Book() {
   const [loadError, setLoadError] = useState(null);
   const [availability, setAvailability] = useState('checking'); // checking | free | taken | unknown
   const [details, setDetails] = useState({ name: '', email: '', phone: '' });
-  const [method, setMethod] = useState('CARD'); // CARD | LATER
+  const [options, setOptions] = useState(null); // which ways of paying are on; null while loading
+  const [method, setMethod] = useState(null); // ONLINE | CARD (demo) | LATER; null until the guest chooses
   const [card, setCard] = useState({ number: '', name: '', expiry: '', cvc: '' });
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
@@ -49,6 +51,13 @@ export default function Book() {
     roomsApi.get(id).then((r) => !cancelled && setRoom(r)).catch((e) => !cancelled && setLoadError(e));
     return () => { cancelled = true; };
   }, [id]);
+
+  useEffect(() => {
+    let cancelled = false;
+    // If the options cannot be loaded, offer only the safe choice: paying at the front desk.
+    paymentsApi.options().then((o) => !cancelled && setOptions(o)).catch(() => !cancelled && setOptions({ onlineEnabled: false, demoCardEnabled: false }));
+    return () => { cancelled = true; };
+  }, []);
 
   // Check again that the room is still free before asking for any details.
   useEffect(() => {
@@ -81,6 +90,7 @@ export default function Book() {
   }
 
   const total = stayTotal(room.pricePerNight, search.nights);
+  const chosen = method ?? (options?.onlineEnabled ? 'ONLINE' : options?.demoCardEnabled ? 'CARD' : 'LATER');
   // A field's error goes away as soon as the guest edits that field.
   const clearError = (key) => setErrors((current) => {
     if (!current[key]) return current;
@@ -95,7 +105,7 @@ export default function Book() {
     event.preventDefault();
     const found = {
       ...(guest ? {} : validateDetails(details)),
-      ...(method === 'CARD' ? Object.fromEntries(Object.entries(validateCard(card)).map(([k, v]) => [`card_${k}`, v])) : {}),
+      ...(chosen === 'CARD' ? Object.fromEntries(Object.entries(validateCard(card)).map(([k, v]) => [`card_${k}`, v])) : {}),
     };
     setErrors(found);
     setFormError('');
@@ -126,7 +136,7 @@ export default function Book() {
 
     // The booking now exists. A failed card payment must not hide that from the guest.
     let paymentError = '';
-    if (method === 'CARD') {
+    if (chosen === 'CARD') {
       try {
         await paymentsApi.pay({ reservationId: reservation.id, method: 'CARD', cardNumber: digitsOnly(card.number) });
       } catch (e) {
@@ -134,6 +144,15 @@ export default function Book() {
       }
     }
     refresh().catch(() => {}); // pick up the saved guest profile; not critical
+    if (chosen === 'ONLINE') {
+      try {
+        const form = await paymentsApi.startOnline(reservation.id);
+        postForm(form.url, form.fields); // the guest leaves for the gateway's page; they return to the booking page
+        return;
+      } catch (e) {
+        paymentError = e.message;
+      }
+    }
     navigate(`/bookings/${reservation.id}`, { replace: true, state: { justBooked: true, paymentError } });
   }
 
@@ -168,19 +187,35 @@ export default function Book() {
 
             <section className="checkout__block" aria-labelledby="payment-title">
               <h2 id="payment-title">Payment</h2>
-              <fieldset className="choices">
-                <legend className="visually-hidden">Payment method</legend>
-                <label className={`choice${method === 'CARD' ? ' is-selected' : ''}`}>
-                  <input type="radio" name="method" value="CARD" checked={method === 'CARD'} onChange={() => setMethod('CARD')} />
-                  <span><strong>Pay by card now</strong><small>Your card is charged {formatPrice(total)} today.</small></span>
-                </label>
-                <label className={`choice${method === 'LATER' ? ' is-selected' : ''}`}>
-                  <input type="radio" name="method" value="LATER" checked={method === 'LATER'} onChange={() => setMethod('LATER')} />
-                  <span><strong>Pay at the front desk</strong><small>Pay in cash or by card when you arrive. We hold the room for you.</small></span>
-                </label>
-              </fieldset>
+              {!options ? <p className="muted" role="status">Loading payment options…</p> : (
+                <fieldset className="choices">
+                  <legend className="visually-hidden">Payment method</legend>
+                  {options.onlineEnabled && (
+                    <label className={`choice${chosen === 'ONLINE' ? ' is-selected' : ''}`}>
+                      <input type="radio" name="method" value="ONLINE" checked={chosen === 'ONLINE'} onChange={() => setMethod('ONLINE')} />
+                      <span>
+                        <strong>Pay online with {options.onlineProvider}</strong>
+                        <small>
+                          You will be taken to {options.onlineProvider}&rsquo;s secure page to pay {formatPrice(total)} by card. We never see your card details.
+                          {options.sandbox && ' Test mode: no real money is taken.'}
+                        </small>
+                      </span>
+                    </label>
+                  )}
+                  {options.demoCardEnabled && (
+                    <label className={`choice${chosen === 'CARD' ? ' is-selected' : ''}`}>
+                      <input type="radio" name="method" value="CARD" checked={chosen === 'CARD'} onChange={() => setMethod('CARD')} />
+                      <span><strong>Pay by card now (demo)</strong><small>Practice payment: no money is taken.</small></span>
+                    </label>
+                  )}
+                  <label className={`choice${chosen === 'LATER' ? ' is-selected' : ''}`}>
+                    <input type="radio" name="method" value="LATER" checked={chosen === 'LATER'} onChange={() => setMethod('LATER')} />
+                    <span><strong>Pay at the front desk</strong><small>Pay in cash or by card when you arrive. We hold the room for you.</small></span>
+                  </label>
+                </fieldset>
+              )}
 
-              {method === 'CARD' && (
+              {chosen === 'CARD' && (
                 <div className="checkout__fields" style={{ marginTop: 'var(--space-5)' }}>
                   <p className="demo-note">
                     <strong>This is a demonstration.</strong> No money is taken, so please do not enter a real card.
@@ -201,8 +236,10 @@ export default function Book() {
               )}
             </section>
 
-            <button type="submit" className="btn btn--dark btn--block checkout__submit" disabled={busy}>
-              {busy ? 'Booking…' : method === 'CARD' ? `Confirm and pay ${formatPrice(total)}` : 'Confirm booking'}
+            <button type="submit" className="btn btn--dark btn--block checkout__submit" disabled={busy || !options}>
+              {busy ? (chosen === 'ONLINE' ? 'Taking you to the payment page…' : 'Booking…')
+                : chosen === 'ONLINE' ? `Continue to ${options.onlineProvider} to pay ${formatPrice(total)}`
+                : chosen === 'CARD' ? `Confirm and pay ${formatPrice(total)}` : 'Confirm booking'}
             </button>
           </form>
 

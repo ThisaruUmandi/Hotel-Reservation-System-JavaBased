@@ -88,9 +88,9 @@ public class ReservationService {
         Reservation r = access.load(id, actor);
         r.cancel(LocalDate.now());
         // A cancelled booking gets its money back.
-        payments.findByReservationId(id).stream()
-                .filter(p -> p.getStatus() == PaymentStatus.PAID)
-                .forEach(Payment::refund);
+        List<Payment> attempts = payments.findByReservationId(id);
+        attempts.stream().filter(p -> p.getStatus() == PaymentStatus.PAID).forEach(Payment::refund); // card/cash: refunded; online: refund pending
+        attempts.stream().filter(p -> p.getStatus() == PaymentStatus.PENDING).forEach(Payment::markFailed); // abandoned online checkouts
         return reservations.save(r);
     }
 }

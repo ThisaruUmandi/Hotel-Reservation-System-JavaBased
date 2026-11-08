@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/payments/payhere/notify").permitAll() // called by PayHere; protected by its signature
                 .requestMatchers(HttpMethod.GET, "/api/rooms", "/api/rooms/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/reservations").hasAnyRole("STAFF", "ADMIN")
                 .requestMatchers("/api/admin/users", "/api/admin/users/**").hasRole("ADMIN")

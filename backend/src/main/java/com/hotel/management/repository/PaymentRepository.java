@@ -9,11 +9,19 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
     List<Payment> findByReservationId(Long reservationId);
     boolean existsByReservationIdAndStatus(Long reservationId, PaymentStatus status);
+
+    @Query("select g from GatewayPayment g where g.orderId = :orderId")
+    Optional<com.hotel.management.model.GatewayPayment> findByOrderId(@Param("orderId") String orderId);
+
+    List<Payment> findByStatus(PaymentStatus status);
+
+    long countByStatus(PaymentStatus status);
 
     @Query("select p.reservation.id from Payment p where p.status = com.hotel.management.model.PaymentStatus.PAID and p.reservation.id in :ids")
     Set<Long> findPaidReservationIds(@Param("ids") Collection<Long> ids);

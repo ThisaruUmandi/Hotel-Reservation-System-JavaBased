@@ -1,3 +1,3 @@
 package com.hotel.management.model;
 
-public enum PaymentStatus { PENDING, PAID, REFUNDED }
+public enum PaymentStatus { PENDING, PAID, FAILED, REFUND_PENDING, REFUNDED }

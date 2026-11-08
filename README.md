@@ -4,8 +4,8 @@ A full-stack hotel booking system: guests search for rooms, book and pay, and ma
 day-to-day from an admin panel.
 
 > **Palmyra House is a fictional hotel** created for coursework. The address, phone number, email and house rules in
-> `frontend/src/config/site.js` are placeholders. Card payments are a **demonstration**: nothing is charged and no real
-> card should be entered.
+> `frontend/src/config/site.js` are placeholders. Payments run in **test mode** only: nothing real is ever charged, and
+> real card numbers should never be entered.
 
 | | |
 |---|---|
@@ -20,7 +20,7 @@ day-to-day from an admin panel.
 **Guests**
 - Search rooms by dates, guests and type, with live availability and the total price for the stay
 - Room pages with photos, amenities and real reviews
-- Register and log in; book and pay by card (demo) or choose to pay at the front desk
+- Register and log in; book, then pay online with **PayHere** (test mode) or choose to pay at the front desk
 - Booking confirmation with a reference (for example `PH00016`); My bookings with Upcoming, Past and Cancelled
 - Cancel free until the day before arrival (card payments are refunded); review a room after the stay
 - Account page with change password
@@ -55,11 +55,43 @@ cp backend/.env.example backend/.env      # then edit it: password, a 32+ charac
 The tables, three sample rooms and their LKR rates are created automatically on first start (Flyway).
 </details>
 
+## Online payments (PayHere)
+
+Guests pay on **PayHere's own secure page**, so card details never touch this site. PayHere is a Sri Lankan payment gateway
+with a free test environment (the "sandbox"). The feature is **optional**: with no PayHere keys the site shows a practice card form,
+so the project still runs anywhere.
+
+**How a payment works**
+1. The guest books, then chooses *Pay online*. The server creates a pending payment and signs the details.
+2. The browser posts them to PayHere, the guest pays there, and PayHere sends them back to their booking page.
+3. **PayHere's server then notifies ours.** Only a notification with a valid signature and the right amount marks the booking paid;
+   what the browser says is never trusted. The booking page checks again every couple of seconds until it hears.
+4. If a paid booking is cancelled, the payment becomes *refund pending* and shows in the admin overview. Staff send the money back in
+   PayHere's dashboard and press *Mark as refunded*.
+
+**To switch it on** (about ten minutes)
+1. Create a free account on [PayHere](https://www.payhere.lk) and open its sandbox. Note your **Merchant ID**. PayHere ties each
+   **Merchant Secret** to a domain or app you register, so register the public address from step 2.
+2. PayHere's servers must reach this app, and they cannot reach `localhost`. Start a tunnel to the backend, for example `ngrok http 8080`,
+   and copy its `https://` address.
+3. Add to `backend/.env` (see `backend/.env.example`):
+   ```
+   PAYHERE_MERCHANT_ID=your-merchant-id
+   PAYHERE_MERCHANT_SECRET=your-merchant-secret
+   PAYHERE_NOTIFY_URL=https://your-tunnel-address/api/payments/payhere/notify
+   ```
+4. Restart the backend. Checkout now offers **Pay online with PayHere**, and the practice card form is switched off.
+   Use PayHere's sandbox test cards (listed in its documentation) to try it.
+
+The automated tests prove the signature rules, the amount checks and the whole payment life cycle without any network, and need no
+PayHere account. PayHere's rules were taken from its
+[Checkout API documentation](https://support.payhere.lk/api-%26-mobile-sdk/checkout-api).
+
 ## Running the tests
 
 ```bash
-cd backend && set -a && . ./.env && set +a && mvn test     # 63 tests, uses the separate hotel_test database
-cd frontend && npm test                                     # 44 tests
+cd backend && set -a && . ./.env && set +a && mvn test     # 88 tests, uses the separate hotel_test database
+cd frontend && npm test                                     # 48 tests
 cd frontend && npm run build                                # production build
 ```
 
@@ -118,9 +150,12 @@ Hibernate only validates the schema; it never changes it.
 | `GET /auth/me`, `POST /auth/change-password` | logged in |
 | `GET /rooms`, `/rooms/{id}`, `/rooms/available`, `/rooms/{id}/reviews` | public |
 | `POST /reservations`, `GET /reservations/mine`, `GET`/`DELETE /reservations/{id}` | logged in (own bookings) |
-| `POST /payments`, `GET /reservations/{id}/payments`, `POST /reviews` | logged in (own bookings; cash is staff-only) |
+| `GET /payments/options`, `POST /payments/online/checkout` | logged in; which payment options are on, and starting an online payment |
+| `POST /payments/payhere/notify` | called by PayHere only; protected by its signature, not a login |
+| `POST /payments`, `GET /reservations/{id}/payments`, `POST /reviews` | logged in (own bookings; cash is staff-only; the practice card only while PayHere is off) |
 | `GET /reservations` | staff and administrators |
 | `GET /admin/summary`, `PATCH /admin/rooms/{id}` | staff and administrators (price changes: administrators) |
+| `GET /admin/refunds`, `PATCH /admin/payments/{id}/refunded` | staff and administrators |
 | `GET`/`POST /admin/users`, `PATCH /admin/users/{id}` | administrators |
 
 Errors always look like `{ "status": 409, "error": "message", "fieldErrors": { } }`.
@@ -131,7 +166,10 @@ Errors always look like `{ "status": 409, "error": "message", "fieldErrors": { }
   user loses access immediately
 - Guests can only see and change their own bookings (someone else's booking looks like it does not exist)
 - Five wrong passwords lock an account for 15 minutes (an address is limited too)
-- Card numbers are never stored: only the brand and last 4 digits; the expiry date and security code never leave the browser
+- Online payments: the merchant secret never leaves the server; every PayHere notification is checked for a valid signature **and**
+  the exact amount before anything is marked paid, repeated notifications change nothing, and the practice card endpoint is switched
+  off while a real gateway is on (otherwise anyone could "pay" with a fake number)
+- With the practice card, only the brand and last 4 digits are kept; the expiry date and security code never leave the browser
 - CORS allows only the website's own origin; secrets live in `backend/.env`, which is git-ignored
 
 ## Design notes
@@ -140,7 +178,9 @@ a sand, palm-green and clay palette. Layouts work from 360 px phones up. The sit
 accessibility audit (axe) on every page. Photos need alternative text and fall back to a neutral frame if missing.
 
 ## Known limits
-- Payments are simulated; there is no real card gateway
+- Payments work in PayHere's **test mode** (or as a practice form without keys); going live would need a merchant account and a public HTTPS site
+- Refunds of online payments are sent back by staff in PayHere's dashboard; the app only tracks that they are owed and done
+- PayHere can only notify a publicly reachable address, so local development needs a tunnel
 - The login lockout is held in memory, so it resets when the server restarts
 - One hotel, one currency, one language
 - Room photos are shared per room type (`frontend/IMAGES.md` lists the files)

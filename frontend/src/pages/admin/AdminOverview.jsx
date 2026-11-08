@@ -35,15 +35,30 @@ function MovementList({ title, rows, empty }) {
 export default function AdminOverview() {
   usePageTitle('Admin: overview');
   const [data, setData] = useState({ status: 'loading' });
+  const [reloadKey, setReloadKey] = useState(0);
+  const [refundBusy, setRefundBusy] = useState(null);
+  const [refundError, setRefundError] = useState('');
   const today = todayISO();
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([adminApi.summary(), reservationsApi.all()])
-      .then(([summary, list]) => !cancelled && setData({ status: 'ready', summary, list }))
+    Promise.all([adminApi.summary(), reservationsApi.all(), adminApi.refunds()])
+      .then(([summary, list, refunds]) => !cancelled && setData({ status: 'ready', summary, list, refunds }))
       .catch((e) => !cancelled && setData({ status: 'error', error: e.message }));
     return () => { cancelled = true; };
-  }, []);
+  }, [reloadKey]);
+
+  async function markRefunded(paymentId) {
+    setRefundBusy(paymentId);
+    setRefundError('');
+    try {
+      await adminApi.markRefunded(paymentId);
+      setReloadKey((k) => k + 1);
+    } catch (e) {
+      setRefundError(e.message);
+    }
+    setRefundBusy(null);
+  }
 
   const arriving = useMemo(() => (data.list ? filterReservations(data.list, { filter: 'arriving', today }) : []), [data.list, today]);
   const leaving = useMemo(() => (data.list ? filterReservations(data.list, { filter: 'leaving', today }) : []), [data.list, today]);
@@ -60,6 +75,7 @@ export default function AdminOverview() {
         <div><dt>Arriving today</dt><dd>{s.arrivalsToday}</dd></div>
         <div><dt>Leaving today</dt><dd>{s.departuresToday}</dd></div>
         <div><dt>In house now</dt><dd>{s.inHouse}<span> of {s.totalRooms} rooms · {occupancyPercent(s.inHouse, s.totalRooms)}%</span></dd></div>
+        <div><dt>Refunds to process</dt><dd>{s.refundsDue}</dd></div>
         <div>
           <dt>Awaiting payment</dt>
           <dd>{s.awaitingPayment}<span> {s.awaitingPayment === 1 ? 'booking' : 'bookings'}</span></dd>
@@ -71,6 +87,31 @@ export default function AdminOverview() {
         <MovementList title="Arriving today" rows={arriving} empty="Nobody is arriving today." />
         <MovementList title="Leaving today" rows={leaving} empty="Nobody is leaving today." />
       </div>
+
+      {data.refunds.length > 0 && (
+        <section aria-labelledby="refunds-h">
+          <h2 id="refunds-h">Refunds to process</h2>
+          <p className="muted small" style={{ marginBottom: 'var(--space-3)' }}>
+            These guests paid online and then cancelled. Send the money back in the payment provider&rsquo;s dashboard, then mark it as refunded here.
+          </p>
+          {refundError && <p className="alert alert--error" role="alert">{refundError}</p>}
+          <ul className="movements">
+            {data.refunds.map((r) => (
+              <li key={r.paymentId}>
+                <div>
+                  <strong>{r.guestName}</strong>
+                  <span className="muted small"> · {r.guestEmail} · {formatPrice(r.amount)} · {bookingRef(r.reservationId)}</span>
+                </div>
+                <div className="movements__side">
+                  <button type="button" className="btn btn--ghost btn--small" disabled={refundBusy === r.paymentId} onClick={() => markRefunded(r.paymentId)}>
+                    {refundBusy === r.paymentId ? 'Saving…' : 'Mark as refunded'}
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <p><Link to="/admin/reservations" className="text-link">Open all reservations</Link></p>
     </div>

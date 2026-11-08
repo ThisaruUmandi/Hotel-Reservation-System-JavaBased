@@ -52,4 +52,9 @@ public class EntityMapper {
         if (parts.length < 2) return parts[0];
         return parts[0] + " " + Character.toUpperCase(parts[parts.length - 1].charAt(0)) + ".";
     }
+
+    public RefundDueResponse toRefundDue(Payment p) {
+        Guest g = p.getReservation().getGuest();
+        return new RefundDueResponse(p.getId(), p.getReservation().getId(), g.getName(), g.getEmail(), p.getAmount(), p.describe());
+    }
 }

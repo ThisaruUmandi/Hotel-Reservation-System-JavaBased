@@ -1,3 +1,3 @@
 package com.hotel.management.model;
 
-public enum PaymentMethod { CARD, CASH }
+public enum PaymentMethod { CARD, CASH, ONLINE }

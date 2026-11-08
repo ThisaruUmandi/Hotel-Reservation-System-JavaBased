@@ -16,9 +16,10 @@ import java.util.List;
 public class PaymentService {
     private final PaymentRepository payments;
     private final ReservationAccess access;
+    private final OnlinePaymentService online;
 
-    public PaymentService(PaymentRepository payments, ReservationAccess access) {
-        this.payments = payments; this.access = access;
+    public PaymentService(PaymentRepository payments, ReservationAccess access, OnlinePaymentService online) {
+        this.payments = payments; this.access = access; this.online = online;
     }
 
     @Transactional
@@ -31,7 +32,10 @@ public class PaymentService {
         if (payments.existsByReservationIdAndStatus(reservation.getId(), PaymentStatus.PAID))
             throw new ConflictException("This reservation is already paid");
 
+        if (req.method() == PaymentMethod.CARD && online.isEnabled())
+            throw new ForbiddenException("Card payments are made through the online checkout");
         Payment payment = switch (req.method()) {
+            case ONLINE -> throw new IllegalArgumentException("Use the online checkout to pay online");
             case CARD -> {
                 if (req.cardNumber() == null || req.cardNumber().isBlank())
                     throw new IllegalArgumentException("Card number is required for card payments");
@@ -42,6 +46,16 @@ public class PaymentService {
                     req.receivedBy() == null || req.receivedBy().isBlank() ? "front desk" : req.receivedBy());
         };
         payment.markPaid();
+        return payments.save(payment);
+    }
+
+    public List<Payment> refundsDue() { return payments.findByStatus(PaymentStatus.REFUND_PENDING); }
+
+    /** Staff confirm they have returned the money (for example in the gateway's dashboard). */
+    @Transactional
+    public Payment completeRefund(Long paymentId) {
+        Payment payment = payments.findById(paymentId).orElseThrow(() -> new com.hotel.management.exception.ResourceNotFoundException("Payment not found"));
+        payment.markRefundCompleted();
         return payments.save(payment);
     }
 

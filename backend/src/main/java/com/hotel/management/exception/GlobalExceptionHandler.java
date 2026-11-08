@@ -20,6 +20,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(404).body(ErrorResponse.of(404, e.getMessage()));
     }
 
+    @ExceptionHandler(InvalidSignatureException.class)
+    ResponseEntity<ErrorResponse> badSignature(InvalidSignatureException e) {
+        return ResponseEntity.badRequest().body(ErrorResponse.of(400, "Invalid notification")); // say nothing useful to an attacker
+    }
+
     @ExceptionHandler(TooManyAttemptsException.class)
     ResponseEntity<ErrorResponse> tooMany(TooManyAttemptsException e) {
         return ResponseEntity.status(429).header("Retry-After", String.valueOf(Math.max(1, e.getRetryAfter().toSeconds())))

@@ -21,3 +21,11 @@ app:
   admin:
     username: ${ADMIN_USERNAME:}
     password: ${ADMIN_PASSWORD:}
+  payhere:
+    # Online payments are switched on only when all three of these are set (see the README).
+    merchant-id: ${PAYHERE_MERCHANT_ID:}
+    merchant-secret: ${PAYHERE_MERCHANT_SECRET:}
+    # PayHere must be able to reach this from the internet, e.g. https://<your-tunnel>/api/payments/payhere/notify
+    notify-url: ${PAYHERE_NOTIFY_URL:}
+    sandbox: ${PAYHERE_SANDBOX:true}
+    frontend-url: ${FRONTEND_URL:http://localhost:5173}

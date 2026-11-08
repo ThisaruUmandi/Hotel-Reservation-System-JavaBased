@@ -4,6 +4,7 @@ import com.hotel.management.dto.*;
 import com.hotel.management.mapper.EntityMapper;
 import com.hotel.management.security.AuthenticatedUser;
 import com.hotel.management.service.DashboardService;
+import com.hotel.management.service.PaymentService;
 import com.hotel.management.service.RoomService;
 import com.hotel.management.service.UserService;
 import jakarta.validation.Valid;
@@ -20,14 +21,22 @@ public class AdminController {
     private final DashboardService dashboard;
     private final RoomService rooms;
     private final UserService users;
+    private final PaymentService payments;
     private final EntityMapper mapper;
 
-    public AdminController(DashboardService dashboard, RoomService rooms, UserService users, EntityMapper mapper) {
-        this.dashboard = dashboard; this.rooms = rooms; this.users = users; this.mapper = mapper;
+    public AdminController(DashboardService dashboard, RoomService rooms, UserService users, PaymentService payments, EntityMapper mapper) {
+        this.dashboard = dashboard; this.rooms = rooms; this.users = users; this.payments = payments; this.mapper = mapper;
     }
 
     @GetMapping("/summary")
     public AdminSummaryResponse summary() { return dashboard.summary(); }
+
+    /** Online payments for cancelled bookings that someone still has to send back. */
+    @GetMapping("/refunds")
+    public List<RefundDueResponse> refundsDue() { return payments.refundsDue().stream().map(mapper::toRefundDue).toList(); }
+
+    @PatchMapping("/payments/{id}/refunded")
+    public RefundDueResponse markRefunded(@PathVariable Long id) { return mapper.toRefundDue(payments.completeRefund(id)); }
 
     @PatchMapping("/rooms/{id}")
     public RoomResponse updateRoom(@PathVariable Long id, @Valid @RequestBody RoomUpdateRequest r,
