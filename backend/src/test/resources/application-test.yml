@@ -1,0 +1,12 @@
+# Tests always use the separate hotel_test database, never hotel_db.
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/hotel_test
+    username: hotel_user
+    password: ${DB_PASSWORD:}
+app:
+  jwt:
+    secret: test-secret-test-secret-test-secret-1234
+  admin:
+    username: ""
+    password: ""
