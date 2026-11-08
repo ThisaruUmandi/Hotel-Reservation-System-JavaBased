@@ -1,0 +1,4 @@
+/* Placeholder reset. The real design system comes in the next step. */
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; }
+.site-header { display: flex; justify-content: space-between; padding: 1rem 1.5rem; }
