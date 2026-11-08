@@ -21,3 +21,15 @@ export function onePerType(rooms) {
     .sort((a, b) => a.pricePerNight - b.pricePerNight)
     .filter((room) => !seen.has(room.type.name) && seen.add(room.type.name));
 }
+
+/** Photos for a room: its own photo if set, otherwise the two shared photos for its type. */
+export function roomGallery(room) {
+  if (room.imageUrl) return [room.imageUrl];
+  const slug = room.type.name.toLowerCase();
+  return [`/images/rooms/${slug}.jpg`, `/images/rooms/${slug}-2.jpg`];
+}
+
+/** Total for a stay, computed in cents so decimals never drift. */
+export function stayTotal(pricePerNight, nights) {
+  return Math.round(pricePerNight * 100) * nights / 100;
+}

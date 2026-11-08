@@ -1,14 +1,27 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addDays, todayISO } from '../../lib/dates';
 import { typeLabel } from '../../lib/rooms';
+import { toQuery } from '../../lib/search';
 import TextField from '../TextField';
 
-/** The booking search on the hero. Sends the guest to the rooms page with their choices in the URL. */
-export default function SearchCard({ types = [], maxGuests = 4 }) {
+/**
+ * The stay search form. On the home page it sends the guest to /rooms; on the rooms page it is
+ * given onSearch so it refines the results in place. variant "bar" is the wide, flat version.
+ */
+export default function SearchCard({
+  types = [], maxGuests = 4, initial, onSearch, variant = 'card',
+  title = 'Find your room', submitLabel = 'Search availability',
+}) {
   const navigate = useNavigate();
+  const titleId = useId();
   const today = todayISO();
-  const [form, setForm] = useState({ checkIn: addDays(today, 1), checkOut: addDays(today, 3), guests: '2', type: '' });
+  const [form, setForm] = useState({
+    checkIn: initial?.checkIn || addDays(today, 1),
+    checkOut: initial?.checkOut || addDays(today, 3),
+    guests: String(Math.min(initial?.guests ?? 2, maxGuests)),
+    type: initial?.type ?? '',
+  });
   const [errors, setErrors] = useState({});
 
   const set = (field) => (event) => setForm((f) => ({ ...f, [field]: event.target.value }));
@@ -27,14 +40,14 @@ export default function SearchCard({ types = [], maxGuests = 4 }) {
     const found = validate();
     setErrors(found);
     if (Object.keys(found).length) return;
-    const params = new URLSearchParams({ checkIn: form.checkIn, checkOut: form.checkOut, guests: form.guests });
-    if (form.type) params.set('type', form.type);
-    navigate(`/rooms?${params}`);
+    const search = { checkIn: form.checkIn, checkOut: form.checkOut, guests: form.guests, type: form.type };
+    if (onSearch) onSearch(search);
+    else navigate(`/rooms?${toQuery(search)}`);
   }
 
   return (
-    <form className="search-card" onSubmit={submit} noValidate aria-labelledby="search-title">
-      <h2 id="search-title" className="search-card__title">Find your room</h2>
+    <form className={`search-card search-card--${variant}`} onSubmit={submit} noValidate aria-labelledby={titleId}>
+      <h2 id={titleId} className={variant === 'bar' ? 'visually-hidden' : 'search-card__title'}>{title}</h2>
       <div className="search-card__grid">
         <TextField label="Check-in" type="date" min={today} value={form.checkIn} onChange={set('checkIn')} error={errors.checkIn} />
         <TextField label="Check-out" type="date" min={form.checkIn || today} value={form.checkOut} onChange={set('checkOut')} error={errors.checkOut} />
@@ -48,7 +61,7 @@ export default function SearchCard({ types = [], maxGuests = 4 }) {
           {types.map((t) => <option key={t} value={t}>{typeLabel(t)}</option>)}
         </TextField>
       </div>
-      <button type="submit" className="btn btn--dark btn--block">Search availability</button>
+      <button type="submit" className="btn btn--dark btn--block">{submitLabel}</button>
     </form>
   );
 }

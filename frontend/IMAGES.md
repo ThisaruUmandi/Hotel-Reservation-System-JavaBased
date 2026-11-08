@@ -1,4 +1,15 @@
-# Images to add
+# Images
+
+## Already added
+`hero/hero.jpg`, `rooms/single.jpg`, `rooms/double.jpg`, `rooms/suite.jpg`, `rooms/single-2.jpg`, `rooms/double-2.jpg`,
+`rooms/suite-2.jpg`, `about/story.jpg`, `about/cta.jpg`.
+
+## Still optional
+`hotel/pool.jpg`, `hotel/dining.jpg`, `hotel/garden.jpg` (used by the room detail page and later sections).
+`hero/hero.jpg` is 1408 px wide, which is a little soft on very large or retina screens. Replace it with a 2400 px
+version whenever you have one.
+
+## Full guide
 
 Put files in `frontend/public/images/` using exactly these names. Until a file exists, the site shows a neutral
 placeholder frame, so nothing breaks. Use JPG or WebP, keep each file under about 400 KB, and avoid text or logos in photos.
