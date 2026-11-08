@@ -94,7 +94,7 @@ export default function BookingPanel({ room, search, onSearchChange }) {
           {parsed.valid ? 'Reserve this room' : 'Choose your dates'}
         </button>
       )}
-      <p className="muted small booking-panel__note">You will not be charged yet. Cancel free until check-in.</p>
+      <p className="muted small booking-panel__note">You will not be charged yet. Cancel free until the day before you arrive.</p>
     </aside>
   );
 }

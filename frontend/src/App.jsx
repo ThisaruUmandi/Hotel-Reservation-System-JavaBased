@@ -4,7 +4,6 @@ import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import RoomDetail from './pages/RoomDetail';
 import Rooms from './pages/Rooms';
-import StyleGuide from './pages/StyleGuide';
 
 export default function App() {
   return (
@@ -13,7 +12,6 @@ export default function App() {
         <Route index element={<Home />} />
         <Route path="/rooms" element={<Rooms />} />
         <Route path="/rooms/:id" element={<RoomDetail />} />
-        <Route path="/styleguide" element={<StyleGuide />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

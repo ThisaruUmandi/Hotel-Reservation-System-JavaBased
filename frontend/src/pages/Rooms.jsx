@@ -65,8 +65,7 @@ export default function Rooms() {
     <>
       <section className="page-head">
         <div className="container">
-          <span className="eyebrow">Rooms and suites</span>
-          <h1>Find a room that <em>fits</em></h1>
+          <h1>Rooms</h1>
           <SearchCard
             key={params.toString()}
             variant="bar"

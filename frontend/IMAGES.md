@@ -4,6 +4,9 @@
 `hero/hero.jpg`, `rooms/single.jpg`, `rooms/double.jpg`, `rooms/suite.jpg`, `rooms/single-2.jpg`, `rooms/double-2.jpg`,
 `rooms/suite-2.jpg`, `about/story.jpg`, `about/cta.jpg`.
 
+## Not used right now
+`about/cta.jpg` (the closing banner was removed in the redesign). Keep it or delete it.
+
 ## Still optional
 `hotel/pool.jpg`, `hotel/dining.jpg`, `hotel/garden.jpg` (used by the room detail page and later sections).
 `hero/hero.jpg` is 1408 px wide, which is a little soft on very large or retina screens. Replace it with a 2400 px

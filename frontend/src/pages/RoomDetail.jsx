@@ -34,8 +34,7 @@ export default function RoomDetail() {
     return (
       <section className="section">
         <div className="container">
-          <span className="eyebrow">{missing ? 'Room not found' : 'Something went wrong'}</span>
-          <h1>{missing ? <>We could not find <em>that room</em></> : <>This page did not <em>load</em></>}</h1>
+          <h1>{missing ? 'Room not found' : 'This page did not load'}</h1>
           <p className="lead" style={{ marginTop: 'var(--space-4)' }}>{missing ? 'It may have been removed.' : error.message}</p>
           <Link to="/rooms" className="btn btn--dark" style={{ marginTop: 'var(--space-6)' }}>See all rooms</Link>
         </div>

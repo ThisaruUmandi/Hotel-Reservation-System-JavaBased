@@ -61,7 +61,7 @@ export default function Layout() {
           <div className="site-footer__grid">
             <div>
               <Link to="/" className="brand"><Logo /></Link>
-              <p className="site-footer__blurb">{site.tagline}. Slow mornings, warm rooms and a table set for you.</p>
+              <p className="site-footer__blurb">{site.tagline}.</p>
             </div>
             <div>
               <h4>Stay</h4>

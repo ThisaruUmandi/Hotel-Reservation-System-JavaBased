@@ -19,8 +19,8 @@
   cursor: pointer;
   transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
 }
-.btn--primary { background: var(--clay); color: #fff; }
-.btn--primary:hover { background: var(--clay-dark); }
+.btn--primary { background: var(--ink); color: var(--sand-50); }
+.btn--primary:hover { background: var(--ink-soft); }
 .btn--dark { background: var(--ink); color: var(--sand-50); }
 .btn--dark:hover { background: var(--ink-soft); }
 .btn--ghost { border-color: var(--ink); color: var(--ink); background: transparent; }

@@ -14,12 +14,13 @@
   --line: #e0d3bb;
 
   /* Accents */
-  --clay: #b5573a;
-  --clay-dark: #98452b;
+  --clay: #94472e;
+  --clay-dark: #7c3a25;
   --clay-tint: #f3dfd4;
   --moss: #4d5a37;
   --moss-dark: #3b462a;
   --moss-tint: #e3e8d6;
+  --star: #b8862b;
   --danger: #9c2f1b;
   --danger-tint: #f6dcd5;
 
@@ -28,9 +29,9 @@
   --font-body: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   /* Shape and spacing */
-  --radius-sm: 6px;
-  --radius: 12px;
-  --radius-lg: 22px;
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-lg: 10px;
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;

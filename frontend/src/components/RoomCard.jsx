@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { site } from '../config/site';
 import { formatPrice, roomImage, stayTotal, typeLabel } from '../lib/rooms';
 import Photo from './Photo';
 
@@ -12,8 +11,8 @@ import Photo from './Photo';
 export default function RoomCard({ room, variant = 'compact', query = '', nights = 0 }) {
   const label = typeLabel(room.type.name);
   const to = `/rooms/${room.id}${query ? `?${query}` : ''}`;
-  const ratio = variant === 'feature' ? 'auto' : variant === 'row' ? '4 / 3' : '4 / 3';
-  const amenities = room.type.amenities.slice(0, variant === 'row' ? 4 : 3);
+  const ratio = variant === 'feature' ? 'auto' : '4 / 3';
+  const amenities = room.type.amenities.slice(0, 4).join(' · ');
 
   return (
     <article className={`room-card room-card--${variant}`}>
@@ -27,13 +26,9 @@ export default function RoomCard({ room, variant = 'compact', query = '', nights
             <p className="room-card__price"><strong>{formatPrice(room.pricePerNight)}</strong> <span>per night</span></p>
           )}
         </div>
-        <p className="room-card__meta">Room {room.roomNumber} · Sleeps {room.type.capacity}{variant !== 'row' && ` · ${site.name}`}</p>
+        <p className="room-card__meta">Room {room.roomNumber} · Sleeps {room.type.capacity}</p>
         <p className="room-card__desc">{room.type.description}</p>
-        {amenities.length > 0 && (
-          <ul className="room-card__amenities">
-            {amenities.map((a) => <li key={a}>{a}</li>)}
-          </ul>
-        )}
+        {amenities && <p className="room-card__amenities">{amenities}</p>}
       </div>
       {variant === 'row' && (
         <div className="room-card__aside">

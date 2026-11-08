@@ -10,14 +10,11 @@ export default function Hero({ types, maxGuests }) {
         <img className="hero__image" src="/images/hero/hero.jpg" alt="" fetchPriority="high" onError={() => setImageFailed(true)} />
       )}
       <div className="container hero__inner">
-        <div className="hero__copy">
-          <span className="eyebrow hero__eyebrow">{site.name}</span>
-          <h1 id="hero-title">A quiet place <em>by the water</em></h1>
-          <p className="lead hero__lead">
-            Unhurried mornings, cool rooms and a table set for you. Choose your dates and we will show you what is free.
-          </p>
+        <div>
+          <h1 id="hero-title">{site.tagline}</h1>
+          <p className="lead hero__lead">Choose your dates to see which rooms are free and what they cost.</p>
         </div>
-        <SearchCard types={types} maxGuests={maxGuests} />
+        <SearchCard types={types} maxGuests={maxGuests} title="Check availability" />
       </div>
     </section>
   );

@@ -6,14 +6,7 @@ import Photo from '../components/Photo';
 import RoomCard from '../components/RoomCard';
 import Stars from '../components/Stars';
 import { site } from '../config/site';
-import { formatPrice, onePerType, typeLabel } from '../lib/rooms';
-
-const PROMISES = [
-  ['Honest prices', 'The rate you see is the rate you pay for your stay. No fees appear at the last step.'],
-  ['Change of plans', 'Cancel any time before check-in and a card payment is refunded in full.'],
-  ['Book in a minute', 'Pick dates, pick a room, confirm. Your booking is saved the moment you finish.'],
-  ['Pay your way', 'Settle by card when you book, or with the team at the front desk when you arrive.'],
-];
+import { onePerType, typeLabel } from '../lib/rooms';
 
 export default function Home() {
   const [rooms, setRooms] = useState(null);
@@ -25,7 +18,7 @@ export default function Home() {
       .list()
       .then(async (list) => {
         setRooms(list);
-        // Show real guest comments only. If nobody has reviewed yet, the section is simply not shown.
+        // Real guest comments only. If nobody has reviewed yet, the section is simply not shown.
         const perRoom = await Promise.all(
           onePerType(list).map((r) =>
             roomsApi.reviews(r.id).then((res) => res.reviews.map((rev) => ({ ...rev, room: typeLabel(r.type.name) }))).catch(() => []),
@@ -41,40 +34,30 @@ export default function Home() {
   const featured = useMemo(() => (rooms ? onePerType(rooms).slice(0, 3) : []), [rooms]);
   const types = useMemo(() => [...new Set((rooms ?? []).map((r) => r.type.name))], [rooms]);
   const maxGuests = useMemo(() => Math.max(2, ...(rooms ?? []).map((r) => r.type.capacity)), [rooms]);
-  const lowest = useMemo(() => (rooms?.length ? Math.min(...rooms.map((r) => r.pricePerNight)) : null), [rooms]);
 
   return (
     <>
       <Hero types={types} maxGuests={maxGuests} />
 
-      <section className="section" aria-labelledby="welcome-title">
-        <div className="container welcome">
-          <Photo className="welcome__photo" src="/images/about/story.jpg" alt={`A quiet corner of ${site.name}`} ratio="4 / 5" label="Portrait" />
-          <div className="welcome__text">
-            <span className="eyebrow">Welcome</span>
-            <h2 id="welcome-title" className="welcome__statement">
-              A stay should feel like coming home to somewhere <em>better</em>. Quiet rooms, honest prices and nothing between you and a good night&rsquo;s sleep.
-            </h2>
-            {rooms && (
-              <dl className="stats">
-                <div><dt>Rooms and suites</dt><dd>{rooms.length}</dd></div>
-                <div><dt>Guests in our largest room</dt><dd>{maxGuests}</dd></div>
-                {lowest !== null && <div><dt>Lowest nightly rate</dt><dd>{formatPrice(lowest)}</dd></div>}
-                <div><dt>Cancellation before check-in</dt><dd>Free</dd></div>
-              </dl>
-            )}
+      <section className="section" aria-labelledby="about-title">
+        <div className="container about">
+          <div className="about__text">
+            <h2 id="about-title">About {site.name}</h2>
+            <p>
+              {site.name} is a small hotel by the water. You can book a room straight from this site: pick your dates,
+              choose a room, and pay by card or at the front desk when you arrive.
+            </p>
+            <p>The price you see is the price you pay for the stay. If your plans change, you can cancel for free until the day before you arrive.</p>
           </div>
+          <Photo src="/images/about/story.jpg" alt={`The beach near ${site.name}`} ratio="4 / 3" label="Photo" />
         </div>
       </section>
 
       <section className="section section--tint" aria-labelledby="rooms-title">
         <div className="container">
           <div className="section-head">
-            <div>
-              <span className="eyebrow">Where you will sleep</span>
-              <h2 id="rooms-title">Rooms made for <em>resting</em></h2>
-            </div>
-            <Link to="/rooms" className="btn btn--ghost">See all rooms</Link>
+            <h2 id="rooms-title">Our rooms</h2>
+            <Link to="/rooms" className="text-link">See all rooms</Link>
           </div>
           {error && <p className="alert alert--error" role="alert">{error}</p>}
           {!error && !rooms && <p className="muted">Loading rooms…</p>}
@@ -86,31 +69,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section" aria-labelledby="promise-title">
-        <div className="container promise">
-          <div>
-            <span className="eyebrow">Why book with us</span>
-            <h2 id="promise-title">Simple, <em>from start to finish</em></h2>
-            <p className="lead" style={{ marginTop: 'var(--space-4)' }}>
-              We would rather you spend your energy on the trip than on the booking.
-            </p>
-          </div>
-          <ol className="promise__list">
-            {PROMISES.map(([title, text], i) => (
-              <li key={title}>
-                <span className="promise__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                <div><h3>{title}</h3><p>{text}</p></div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
       {reviews.length > 0 && (
-        <section className="section section--tint" aria-labelledby="reviews-title">
+        <section className="section" aria-labelledby="reviews-title">
           <div className="container">
-            <span className="eyebrow">Guest notes</span>
-            <h2 id="reviews-title">In their <em>own words</em></h2>
+            <h2 id="reviews-title">What guests say</h2>
             <div className="reviews">
               {reviews.map((r) => (
                 <figure key={r.id} className="review">
@@ -124,20 +86,17 @@ export default function Home() {
         </section>
       )}
 
-      <section className="cta" aria-labelledby="cta-title">
-        <CtaImage />
-        <div className="container cta__inner">
-          <h2 id="cta-title">Ready when <em>you</em> are</h2>
-          <p className="lead">Pick your dates and a room, and we will keep it for you.</p>
-          <Link to="/rooms" className="btn btn--primary">Book a stay</Link>
+      <section className={`section${reviews.length > 0 ? ' section--tint' : ''}`} aria-labelledby="facts-title">
+        <div className="container">
+          <h2 id="facts-title" style={{ marginBottom: 'var(--space-5)' }}>Good to know</h2>
+          <dl className="facts">
+            {site.facts.map(([label, text]) => (
+              <div key={label}><dt>{label}</dt><dd>{text}</dd></div>
+            ))}
+            <div><dt>Find us</dt><dd>{site.contact.address} · {site.contact.phone} · {site.contact.email}</dd></div>
+          </dl>
         </div>
       </section>
     </>
   );
-}
-
-function CtaImage() {
-  const [failed, setFailed] = useState(false);
-  if (failed) return null;
-  return <img className="cta__image" src="/images/about/cta.jpg" alt="" loading="lazy" onError={() => setFailed(true)} />;
 }
