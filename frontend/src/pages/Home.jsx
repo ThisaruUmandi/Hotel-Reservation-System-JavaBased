@@ -10,15 +10,21 @@ export default function Home() {
     roomsApi.list().then(setRooms).catch((e) => setError(e.message));
   }, []);
 
-  if (error) return <p role="alert">{error}</p>;
-  if (!rooms) return <p>Loading rooms…</p>;
   return (
-    <ul>
-      {rooms.map((room) => (
-        <li key={room.id}>
-          Room {room.roomNumber} · {room.type.name} · ${room.pricePerNight} per night
-        </li>
-      ))}
-    </ul>
+    <section className="section">
+      <div className="container">
+        <span className="eyebrow">Rooms</span>
+        <h1>Stay a while</h1>
+        {error && <p className="alert alert--error" role="alert" style={{ marginTop: 'var(--space-5)' }}>{error}</p>}
+        {!error && !rooms && <p className="muted" style={{ marginTop: 'var(--space-5)' }}>Loading rooms…</p>}
+        {rooms && (
+          <ul style={{ marginTop: 'var(--space-5)', paddingLeft: '1.2rem' }}>
+            {rooms.map((room) => (
+              <li key={room.id}>Room {room.roomNumber} · {room.type.name} · ${room.pricePerNight} per night</li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
   );
 }

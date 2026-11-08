@@ -1,0 +1,47 @@
+/* Design tokens: warm, earthy palette inspired by clay, sand, palm and ink. */
+:root {
+  /* Sand: page and surface backgrounds */
+  --sand-50: #faf6ef;
+  --sand-100: #f3ece0;
+  --sand-200: #e8dcc7;
+  --sand-300: #d9c9ac;
+  --surface: #fffdf9;
+
+  /* Text */
+  --ink: #2b2118;
+  --ink-soft: #4a3d31;
+  --muted: #6e6253;
+  --line: #e0d3bb;
+
+  /* Accents */
+  --clay: #b5573a;
+  --clay-dark: #98452b;
+  --clay-tint: #f3dfd4;
+  --moss: #4d5a37;
+  --moss-dark: #3b462a;
+  --moss-tint: #e3e8d6;
+  --danger: #9c2f1b;
+  --danger-tint: #f6dcd5;
+
+  /* Type */
+  --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
+  --font-body: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Shape and spacing */
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-lg: 22px;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --space-9: 7rem;
+
+  --container: 1200px;
+  --gutter: clamp(16px, 4vw, 32px);
+  --header-h: 76px;
+}

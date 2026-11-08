@@ -1,0 +1,104 @@
+.container { width: 100%; max-width: calc(var(--container) + 2 * var(--gutter)); margin-inline: auto; padding-inline: var(--gutter); }
+.section { padding-block: clamp(var(--space-7), 8vw, var(--space-9)); }
+.section--tint { background: var(--sand-100); }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 46px;
+  padding: 0.65rem 1.4rem;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+.btn--primary { background: var(--clay); color: #fff; }
+.btn--primary:hover { background: var(--clay-dark); }
+.btn--dark { background: var(--ink); color: var(--sand-50); }
+.btn--dark:hover { background: var(--ink-soft); }
+.btn--ghost { border-color: var(--ink); color: var(--ink); background: transparent; }
+.btn--ghost:hover { background: var(--ink); color: var(--sand-50); }
+.btn--small { min-height: 38px; padding: 0.4rem 1rem; font-size: 0.9rem; }
+.btn--block { width: 100%; }
+.btn[disabled], .btn[aria-disabled='true'] { opacity: 0.5; cursor: not-allowed; }
+
+.link-quiet {
+  font: inherit;
+  font-weight: 600;
+  color: var(--clay-dark);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--clay-tint);
+  text-underline-offset: 0.25em;
+}
+.link-quiet:hover { text-decoration-color: currentColor; }
+
+/* ---------- Forms ---------- */
+.field { display: flex; flex-direction: column; gap: var(--space-2); }
+.field__label { font-size: 0.9rem; font-weight: 600; color: var(--ink); }
+.field__hint { font-size: 0.85rem; color: var(--muted); }
+.field__error { font-size: 0.85rem; font-weight: 500; color: var(--danger); }
+
+.input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.6rem 0.9rem;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.input::placeholder { color: #9a8d79; }
+.input:hover { border-color: var(--sand-300); }
+.input:focus-visible { outline: none; border-color: var(--clay); box-shadow: 0 0 0 3px var(--clay-tint); }
+.input[aria-invalid='true'] { border-color: var(--danger); }
+.input[aria-invalid='true']:focus-visible { box-shadow: 0 0 0 3px var(--danger-tint); }
+select.input { appearance: none; padding-right: 2.4rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' fill='none' stroke='%236e6253' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 0.9rem center; }
+textarea.input { min-height: 7rem; resize: vertical; }
+
+.alert { padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); border: 1px solid; font-size: 0.95rem; }
+.alert--error { background: var(--danger-tint); border-color: #e3b3a6; color: var(--danger); }
+.alert--success { background: var(--moss-tint); border-color: #c4cfab; color: var(--moss-dark); }
+
+/* ---------- Badges ---------- */
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  background: var(--sand-200);
+  color: var(--ink-soft);
+}
+.badge--confirmed, .badge--paid { background: var(--moss-tint); color: var(--moss-dark); }
+.badge--cancelled, .badge--refunded { background: var(--clay-tint); color: var(--clay-dark); }
+
+/* ---------- Surfaces ---------- */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.card--pad { padding: var(--space-5); }
+
+/* ---------- Photos (with a tidy fallback until real images are added) ---------- */
+.photo { position: relative; overflow: hidden; background: var(--sand-200); border-radius: var(--radius); }
+.photo img { width: 100%; height: 100%; object-fit: cover; }
+.photo__empty {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  color: var(--muted);
+  font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase;
+  background-image: repeating-linear-gradient(135deg, transparent 0 14px, rgba(110, 98, 83, 0.07) 14px 15px);
+}
