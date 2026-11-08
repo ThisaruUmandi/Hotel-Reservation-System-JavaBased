@@ -1,0 +1,43 @@
+package com.hotel.management.exception;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/** One place that turns exceptions into consistent JSON error responses. */
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    ResponseEntity<ErrorResponse> notFound(ResourceNotFoundException e) {
+        return ResponseEntity.status(404).body(ErrorResponse.of(404, e.getMessage()));
+    }
+
+    @ExceptionHandler({ConflictException.class, IllegalStateException.class})
+    ResponseEntity<ErrorResponse> conflict(RuntimeException e) {
+        return ResponseEntity.status(409).body(ErrorResponse.of(409, e.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    ResponseEntity<ErrorResponse> badRequest(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(ErrorResponse.of(400, e.getMessage()));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    ResponseEntity<ErrorResponse> validation(MethodArgumentNotValidException e) {
+        Map<String, String> fields = new LinkedHashMap<>();
+        e.getBindingResult().getFieldErrors()
+                .forEach(f -> fields.putIfAbsent(f.getField(), f.getDefaultMessage()));
+        return ResponseEntity.badRequest().body(ErrorResponse.of(400, "Validation failed", fields));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    ResponseEntity<ErrorResponse> unreadable(HttpMessageNotReadableException e) {
+        return ResponseEntity.badRequest().body(ErrorResponse.of(400, "Malformed JSON or invalid value"));
+    }
+}

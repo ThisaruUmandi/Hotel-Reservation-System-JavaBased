@@ -1,55 +1,39 @@
 package com.hotel.management.controller;
 
-import com.hotel.management.model.*;
-import com.hotel.management.repository.RoomRepository;
+import com.hotel.management.dto.BookingRequest;
+import com.hotel.management.dto.ReservationResponse;
+import com.hotel.management.mapper.EntityMapper;
+import com.hotel.management.model.Guest;
 import com.hotel.management.service.ReservationService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/reservations")
 public class ReservationController {
     private final ReservationService service;
-    private final RoomRepository rooms;
+    private final EntityMapper mapper;
 
-    public ReservationController(ReservationService service, RoomRepository rooms) {
-        this.service = service; this.rooms = rooms;
+    public ReservationController(ReservationService service, EntityMapper mapper) {
+        this.service = service; this.mapper = mapper;
     }
 
-    public record BookingRequest(Long roomId, String name, String email, String phone,
-                                 Integer guests, LocalDate checkIn, LocalDate checkOut) {}
+    @GetMapping
+    public List<ReservationResponse> all() { return service.findAll().stream().map(mapper::toResponse).toList(); }
 
-    @GetMapping("/rooms")
-    public List<Room> rooms() { return rooms.findAll(); }
+    @GetMapping("/{id}")
+    public ReservationResponse one(@PathVariable Long id) { return mapper.toResponse(service.get(id)); }
 
-    @GetMapping("/reservations")
-    public List<Reservation> all() { return service.findAll(); }
-
-    @GetMapping("/reservations/{id}")
-    public Reservation one(@PathVariable Long id) { return service.get(id); }
-
-    @PostMapping("/reservations")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Reservation create(@RequestBody BookingRequest b) {
-        return service.create(b.roomId(), new Guest(b.name(), b.email(), b.phone()),
-                b.guests() == null ? 1 : b.guests(), b.checkIn(), b.checkOut());
+    public ReservationResponse create(@Valid @RequestBody BookingRequest b) {
+        Guest guest = new Guest(b.name(), b.email(), b.phone());
+        return mapper.toResponse(service.create(b.roomId(), guest, b.guests(), b.checkIn(), b.checkOut()));
     }
 
-    @DeleteMapping("/reservations/{id}")
-    public Reservation cancel(@PathVariable Long id) { return service.cancel(id); }
-
-    @ExceptionHandler(NoSuchElementException.class)
-    ResponseEntity<?> notFound(Exception e) { return ResponseEntity.status(404).body(Map.of("error", e.getMessage())); }
-
-    @ExceptionHandler(IllegalStateException.class)
-    ResponseEntity<?> conflict(Exception e) { return ResponseEntity.status(409).body(Map.of("error", e.getMessage())); }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    ResponseEntity<?> bad(Exception e) { return ResponseEntity.badRequest().body(Map.of("error", e.getMessage())); }
+    @DeleteMapping("/{id}")
+    public ReservationResponse cancel(@PathVariable Long id) { return mapper.toResponse(service.cancel(id)); }
 }

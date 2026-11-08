@@ -1,5 +1,6 @@
 package com.hotel.management.service;
 
+import com.hotel.management.exception.ConflictException;
 import com.hotel.management.model.Role;
 import com.hotel.management.model.User;
 import com.hotel.management.repository.UserRepository;
@@ -17,7 +18,7 @@ public class UserService {
 
     public User register(String username, String password) {
         if (users.findByUsername(username).isPresent())
-            throw new IllegalArgumentException("Username already taken");
+            throw new ConflictException("Username already taken");
         return users.save(new User(username, encoder.encode(password), Role.GUEST));
     }
 
