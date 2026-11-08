@@ -141,6 +141,40 @@ class SecurityApiTest extends ApiTestBase {
     }
 
     @Test
+    void repeatedWrongPasswordsLockTheAccountTemporarily() throws Exception {
+        newUser("erin", Role.GUEST);
+        String wrong = "{\"username\":\"erin\",\"password\":\"not-the-password\"}";
+        for (int i = 0; i < 5; i++) {
+            mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON).content(wrong)).andExpect(status().isUnauthorized());
+        }
+        // Locked: even the right password is refused for now, and the response says when to retry.
+        mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"erin\",\"password\":\"password123\"}"))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(header().exists("Retry-After"))
+                .andExpect(jsonPath("$.error").value(org.hamcrest.Matchers.containsString("Too many failed attempts")));
+        // Someone else is not affected.
+        newUser("frank", Role.GUEST);
+        mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"frank\",\"password\":\"password123\"}")).andExpect(status().isOk());
+    }
+
+    @Test
+    void aSuccessfulLoginForgetsEarlierMistakes() throws Exception {
+        newUser("gita", Role.GUEST);
+        for (int i = 0; i < 4; i++) {
+            mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"username\":\"gita\",\"password\":\"wrong-password\"}")).andExpect(status().isUnauthorized());
+        }
+        mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"gita\",\"password\":\"password123\"}")).andExpect(status().isOk());
+        for (int i = 0; i < 4; i++) { // four more mistakes are fine because the counter was reset
+            mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"username\":\"gita\",\"password\":\"wrong-password\"}")).andExpect(status().isUnauthorized());
+        }
+    }
+
+    @Test
     void weakCredentialsAreRejected() throws Exception {
         mvc.perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON)
                 .content("{\"username\":\"ab\",\"password\":\"short\"}"))

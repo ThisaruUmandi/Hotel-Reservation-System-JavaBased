@@ -5,8 +5,10 @@ import AuthLayout from '../components/AuthLayout';
 import PasswordField from '../components/PasswordField';
 import TextField from '../components/TextField';
 import { validateAccount } from '../lib/booking';
+import { usePageTitle } from '../lib/usePageTitle';
 
 export default function Register() {
+  usePageTitle('Create an account');
   const { user, register } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();

@@ -8,8 +8,10 @@ import RoomCard from '../components/RoomCard';
 import Stars from '../components/Stars';
 import { site } from '../config/site';
 import { onePerType, typeLabel } from '../lib/rooms';
+import { usePageTitle } from '../lib/usePageTitle';
 
 export default function Home() {
+  usePageTitle(null);
   const [rooms, setRooms] = useState(null);
   const [error, setError] = useState('');
   const [reviews, setReviews] = useState([]);

@@ -45,7 +45,7 @@
 .site-footer .brand { color: var(--sand-50); }
 .site-footer .brand__mark { color: var(--sand-200); }
 .site-footer__blurb { margin-top: var(--space-4); max-width: 34ch; color: var(--sand-300); }
-.site-footer h4 { font-size: 0.9rem; color: var(--sand-50); margin-bottom: var(--space-4); }
+.site-footer__title { font-size: 0.9rem; color: var(--sand-50); margin-bottom: var(--space-4); }
 .site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
 .site-footer a { text-decoration: none; }
 .site-footer a:hover { color: #fff; text-decoration: underline; }

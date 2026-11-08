@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { reservationsApi } from '../api/reservations';
 import BookingRow from '../components/BookingRow';
 import { groupBookings } from '../lib/bookings';
+import { usePageTitle } from '../lib/usePageTitle';
 
 const TABS = [
   ['upcoming', 'Upcoming'],
@@ -16,6 +17,7 @@ const EMPTY = {
 };
 
 export default function MyBookings() {
+  usePageTitle('My bookings');
   const [state, setState] = useState({ status: 'loading', list: [], error: '' });
   const [tab, setTab] = useState(null);
   const [attempt, setAttempt] = useState(0);
@@ -59,7 +61,7 @@ export default function MyBookings() {
 
             {state.status === 'ready' && shown.length === 0 && (
               <div className="empty">
-                <h3>{EMPTY[active][0]}</h3>
+                <h2>{EMPTY[active][0]}</h2>
                 <p className="muted">{EMPTY[active][1]}</p>
                 {active === 'upcoming' && <Link to="/rooms" className="btn btn--dark btn--small">Find a room</Link>}
               </div>

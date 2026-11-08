@@ -6,7 +6,9 @@ import com.hotel.management.exception.ResourceNotFoundException;
 import com.hotel.management.mapper.EntityMapper;
 import com.hotel.management.security.AuthenticatedUser;
 import com.hotel.management.security.JwtService;
+import com.hotel.management.security.LoginGuard;
 import com.hotel.management.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +21,10 @@ public class AuthController {
     private final UserService users;
     private final JwtService jwt;
     private final EntityMapper mapper;
+    private final LoginGuard guard;
 
-    public AuthController(UserService users, JwtService jwt, EntityMapper mapper) {
-        this.users = users; this.jwt = jwt; this.mapper = mapper;
+    public AuthController(UserService users, JwtService jwt, EntityMapper mapper, LoginGuard guard) {
+        this.users = users; this.jwt = jwt; this.mapper = mapper; this.guard = guard;
     }
 
     @PostMapping("/register")
@@ -32,10 +35,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest c) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest c, HttpServletRequest request) {
+        String address = request.getRemoteAddr();
+        guard.check(c.username(), address); // locked out? say so before looking at the password
         return users.login(c.username(), c.password())
-                .<ResponseEntity<?>>map(u -> ResponseEntity.ok(new AuthResponse(jwt.generate(u), mapper.toResponse(u))))
-                .orElse(ResponseEntity.status(401).body(ErrorResponse.of(401, "Invalid username or password")));
+                .<ResponseEntity<?>>map(u -> {
+                    guard.succeeded(c.username());
+                    return ResponseEntity.ok(new AuthResponse(jwt.generate(u), mapper.toResponse(u)));
+                })
+                .orElseGet(() -> {
+                    guard.failed(c.username(), address);
+                    return ResponseEntity.status(401).body(ErrorResponse.of(401, "Invalid username or password"));
+                });
     }
 
     @PostMapping("/change-password")

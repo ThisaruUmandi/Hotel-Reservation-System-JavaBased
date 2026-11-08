@@ -6,6 +6,7 @@ import { filterReservations, occupancyPercent } from '../../lib/admin';
 import { bookingRef } from '../../lib/booking';
 import { formatLong, todayISO } from '../../lib/dates';
 import { formatPrice, typeLabel } from '../../lib/rooms';
+import { usePageTitle } from '../../lib/usePageTitle';
 
 function MovementList({ title, rows, empty }) {
   return (
@@ -32,6 +33,7 @@ function MovementList({ title, rows, empty }) {
 }
 
 export default function AdminOverview() {
+  usePageTitle('Admin: overview');
   const [data, setData] = useState({ status: 'loading' });
   const today = todayISO();
 

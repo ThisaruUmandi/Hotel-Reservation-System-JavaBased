@@ -6,6 +6,7 @@ import RoomCard from '../components/RoomCard';
 import { formatDay } from '../lib/dates';
 import { typeLabel } from '../lib/rooms';
 import { parseSearch, toQuery } from '../lib/search';
+import { usePageTitle } from '../lib/usePageTitle';
 
 const SORTS = {
   'price-asc': ['Price: low to high', (a, b) => a.pricePerNight - b.pricePerNight],
@@ -14,6 +15,7 @@ const SORTS = {
 };
 
 export default function Rooms() {
+  usePageTitle('Rooms');
   const [params, setParams] = useSearchParams();
   const search = useMemo(() => parseSearch(params), [params]);
   const [data, setData] = useState({ status: 'loading', all: [], available: null, error: '' });

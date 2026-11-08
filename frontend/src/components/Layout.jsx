@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { site } from '../config/site';
+import ErrorBoundary from './ErrorBoundary';
 import Logo from './Logo';
 
 export default function Layout() {
@@ -20,6 +21,12 @@ export default function Layout() {
   }, []);
 
   useEffect(() => setOpen(false), [pathname]); // close the mobile menu after navigating
+
+  // A new page starts at the top, and keyboard and screen-reader users start at its content.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.getElementById('content')?.focus({ preventScroll: true });
+  }, [pathname]);
 
   return (
     <>
@@ -64,7 +71,7 @@ export default function Layout() {
         </div>
       </header>
 
-      <main id="content"><Outlet /></main>
+      <main id="content" tabIndex={-1}><ErrorBoundary key={pathname}><Outlet /></ErrorBoundary></main>
 
       <footer className="site-footer">
         <div className="container">
@@ -74,14 +81,14 @@ export default function Layout() {
               <p className="site-footer__blurb">{site.tagline}.</p>
             </div>
             <div>
-              <h4>Stay</h4>
+              <h2 className="site-footer__title">Stay</h2>
               <ul>
                 <li><Link to="/rooms">Rooms and suites</Link></li>
                 <li><Link to="/bookings">Manage a booking</Link></li>
               </ul>
             </div>
             <div>
-              <h4>Contact</h4>
+              <h2 className="site-footer__title">Contact</h2>
               <ul>
                 <li>{site.contact.address}</li>
                 <li><a href={`tel:${site.contact.phone.replace(/\s/g, '')}`}>{site.contact.phone}</a></li>

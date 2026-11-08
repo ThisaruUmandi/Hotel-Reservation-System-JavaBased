@@ -8,6 +8,7 @@ import { bookingRef } from '../lib/booking';
 import { canCancel, canReview } from '../lib/bookings';
 import { formatLong } from '../lib/dates';
 import { formatPrice, typeLabel } from '../lib/rooms';
+import { usePageTitle } from '../lib/usePageTitle';
 
 const STATUS = { CONFIRMED: 'Confirmed', CANCELLED: 'Cancelled', COMPLETED: 'Completed' };
 
@@ -20,6 +21,7 @@ export default function BookingDetail() {
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState('');
+  usePageTitle(booking ? `Booking ${bookingRef(booking.id)}` : 'Booking');
 
   const load = useCallback(async () => {
     const [b, p] = await Promise.all([reservationsApi.get(id), paymentsApi.forReservation(id)]);

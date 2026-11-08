@@ -20,6 +20,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(404).body(ErrorResponse.of(404, e.getMessage()));
     }
 
+    @ExceptionHandler(TooManyAttemptsException.class)
+    ResponseEntity<ErrorResponse> tooMany(TooManyAttemptsException e) {
+        return ResponseEntity.status(429).header("Retry-After", String.valueOf(Math.max(1, e.getRetryAfter().toSeconds())))
+                .body(ErrorResponse.of(429, e.getMessage()));
+    }
+
     @ExceptionHandler(ForbiddenException.class)
     ResponseEntity<ErrorResponse> forbidden(ForbiddenException e) {
         return ResponseEntity.status(403).body(ErrorResponse.of(403, e.getMessage()));

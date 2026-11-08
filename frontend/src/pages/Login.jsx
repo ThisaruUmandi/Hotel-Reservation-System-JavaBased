@@ -4,8 +4,10 @@ import { useAuth } from '../auth/AuthContext';
 import AuthLayout from '../components/AuthLayout';
 import PasswordField from '../components/PasswordField';
 import TextField from '../components/TextField';
+import { usePageTitle } from '../lib/usePageTitle';
 
 export default function Login() {
+  usePageTitle('Log in');
   const { user, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();

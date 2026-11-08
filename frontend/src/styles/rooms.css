@@ -30,6 +30,7 @@
 .chip[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--sand-50); }
 
 .results { display: grid; gap: var(--space-4); }
+.empty h2, .empty h3 { font-size: 1.15rem; }
 .empty { padding: var(--space-7) var(--space-5); text-align: center; border: 1.5px dashed var(--sand-300); border-radius: var(--radius); display: grid; gap: var(--space-3); justify-items: center; }
 
 .room-card--row { transition: border-color 0.2s ease, box-shadow 0.2s ease; display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr) auto; gap: var(--space-5); align-items: stretch; padding: var(--space-3); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }

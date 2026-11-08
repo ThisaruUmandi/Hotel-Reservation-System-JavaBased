@@ -3,6 +3,7 @@ import { adminApi } from '../../api/admin';
 import { roomsApi } from '../../api/rooms';
 import { useAuth } from '../../auth/AuthContext';
 import { formatPrice, typeLabel } from '../../lib/rooms';
+import { usePageTitle } from '../../lib/usePageTitle';
 
 function RoomRow({ room, isAdmin, onChanged }) {
   const [price, setPrice] = useState(String(room.pricePerNight));
@@ -68,6 +69,7 @@ function RoomRow({ room, isAdmin, onChanged }) {
 }
 
 export default function AdminRooms() {
+  usePageTitle('Admin: rooms');
   const { user } = useAuth();
   const [state, setState] = useState({ status: 'loading', rooms: [], error: '' });
 

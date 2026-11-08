@@ -4,10 +4,12 @@ import { useAuth } from '../../auth/AuthContext';
 import PasswordField from '../../components/PasswordField';
 import TextField from '../../components/TextField';
 import { validateAccount } from '../../lib/booking';
+import { usePageTitle } from '../../lib/usePageTitle';
 
 const ROLES = { GUEST: 'Guest', STAFF: 'Staff', ADMIN: 'Administrator' };
 
 export default function AdminStaff() {
+  usePageTitle('Admin: staff');
   const { user } = useAuth();
   const [state, setState] = useState({ status: 'loading', users: [], error: '' });
   const [notice, setNotice] = useState('');

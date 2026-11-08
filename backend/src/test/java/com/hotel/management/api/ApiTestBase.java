@@ -3,6 +3,7 @@ package com.hotel.management.api;
 import com.hotel.management.model.*;
 import com.hotel.management.repository.*;
 import com.hotel.management.security.JwtService;
+import com.hotel.management.security.LoginGuard;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -27,12 +28,14 @@ abstract class ApiTestBase {
     @Autowired protected ReservationRepository reservations;
     @Autowired protected PasswordEncoder encoder;
     @Autowired protected JwtService jwt;
+    @Autowired protected LoginGuard loginGuard;
 
     protected LocalDate in;
     protected LocalDate out;
 
     @BeforeEach
     void dates() {
+        loginGuard.clear(); // lockouts are kept in memory and would otherwise leak between tests
         in = LocalDate.now().plusDays(40);
         out = in.plusDays(3);
     }

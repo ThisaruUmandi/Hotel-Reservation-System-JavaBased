@@ -44,6 +44,8 @@ p { margin: 0; }
 
 body { font-feature-settings: 'ss01', 'kern'; }
 
+main:focus { outline: none; } /* focus moves here after navigating; it is not interactive */
+
 a { color: inherit; text-decoration-color: var(--sand-300); text-underline-offset: 0.2em; }
 a:hover { text-decoration-color: currentColor; }
 

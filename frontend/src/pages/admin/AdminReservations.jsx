@@ -8,10 +8,12 @@ import { bookingRef } from '../../lib/booking';
 import { canCancel, stage } from '../../lib/bookings';
 import { formatRange } from '../../lib/dates';
 import { formatPrice, typeLabel } from '../../lib/rooms';
+import { usePageTitle } from '../../lib/usePageTitle';
 
 const STAGE = { upcoming: 'Upcoming', current: 'In house', past: 'Completed', cancelled: 'Cancelled' };
 
 export default function AdminReservations() {
+  usePageTitle('Admin: reservations');
   const { user } = useAuth();
   const [state, setState] = useState({ status: 'loading', list: [], error: '' });
   const [query, setQuery] = useState('');
@@ -75,7 +77,7 @@ export default function AdminReservations() {
       </div>
 
       {state.status === 'loading' ? <p className="muted" role="status">Loading reservations…</p> : rows.length === 0 ? (
-        <div className="empty"><h3>No reservations match</h3><p className="muted">Try a different search or filter.</p></div>
+        <div className="empty"><h2>No reservations match</h2><p className="muted">Try a different search or filter.</p></div>
       ) : (
         <div className="table-wrap">
           <table className="table">

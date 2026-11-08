@@ -9,6 +9,7 @@ import Stars from '../components/Stars';
 import { site } from '../config/site';
 import { roomGallery, typeLabel } from '../lib/rooms';
 import { parseSearch, toQuery } from '../lib/search';
+import { usePageTitle } from '../lib/usePageTitle';
 
 export default function RoomDetail() {
   const { id } = useParams();
@@ -17,6 +18,7 @@ export default function RoomDetail() {
   const [room, setRoom] = useState(null);
   const [reviews, setReviews] = useState(null);
   const [error, setError] = useState(null);
+  usePageTitle(room ? `${typeLabel(room.type.name)}, room ${room.roomNumber}` : 'Room');
 
   useEffect(() => {
     let cancelled = false;

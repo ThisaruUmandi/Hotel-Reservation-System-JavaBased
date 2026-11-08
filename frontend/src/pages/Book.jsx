@@ -11,6 +11,7 @@ import {
 } from '../lib/booking';
 import { formatPrice, stayTotal } from '../lib/rooms';
 import { parseSearch, toQuery } from '../lib/search';
+import { usePageTitle } from '../lib/usePageTitle';
 
 function Notice({ title, children, to, action }) {
   return (
@@ -25,6 +26,7 @@ function Notice({ title, children, to, action }) {
 }
 
 export default function Book() {
+  usePageTitle('Confirm your booking');
   const { id } = useParams();
   const [params] = useSearchParams();
   const search = useMemo(() => parseSearch(params), [params]);

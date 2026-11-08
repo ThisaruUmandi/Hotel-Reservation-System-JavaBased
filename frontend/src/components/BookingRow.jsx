@@ -23,7 +23,7 @@ export default function BookingRow({ booking }) {
       </Link>
       <div className="booking-row__info">
         <p className="muted small">{bookingRef(booking.id)}</p>
-        <h3><Link to={to}>{label}</Link></h3>
+        <h2><Link to={to}>{label}</Link></h2>
         <p>{formatRange(booking.checkIn, booking.checkOut)}</p>
         <p className="muted small">
           Room {booking.room.roomNumber} · {booking.nights} {booking.nights === 1 ? 'night' : 'nights'} · {booking.numberOfGuests} {booking.numberOfGuests === 1 ? 'guest' : 'guests'}

@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { authApi } from '../api/auth';
 import { useAuth } from '../auth/AuthContext';
 import PasswordField from '../components/PasswordField';
+import { usePageTitle } from '../lib/usePageTitle';
 
 const ROLES = { GUEST: 'Guest', STAFF: 'Staff', ADMIN: 'Administrator' };
 
 export default function Account() {
+  usePageTitle('Account');
   const { user } = useAuth();
   const [form, setForm] = useState({ current: '', next: '', confirm: '' });
   const [errors, setErrors] = useState({});
