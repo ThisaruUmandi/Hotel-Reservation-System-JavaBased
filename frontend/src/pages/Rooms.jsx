@@ -76,12 +76,12 @@ export default function Rooms() {
             initial={search}
             onSearch={refine}
           />
-          {search.error && <p className="alert alert--error" role="alert" style={{ marginTop: 'var(--space-4)' }}>{search.error}</p>}
         </div>
       </section>
 
-      <section className="section" style={{ paddingTop: 'var(--space-6)' }}>
+      <section className="section results-section">
         <div className="container">
+          {search.error && <p className="alert alert--error" role="alert" style={{ marginBottom: 'var(--space-5)' }}>{search.error}</p>}
           {data.status === 'error' ? (
             <div className="alert alert--error" role="alert">
               <p>{data.error}</p>

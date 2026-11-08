@@ -102,3 +102,15 @@ textarea.input { min-height: 7rem; resize: vertical; }
   font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase;
   background-image: repeating-linear-gradient(135deg, transparent 0 14px, rgba(110, 98, 83, 0.07) 14px 15px);
 }
+
+/* ---------- Motion ---------- */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.6, 0.2, 1); }
+.reveal.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
+.photo img { transition: transform 0.8s cubic-bezier(0.2, 0.6, 0.2, 1); }
+
+.section--dark { background: var(--moss-dark); color: var(--sand-100); }
+.section--dark h2 { color: #fff; }
+.section--dark .text-link { color: #fff; text-decoration-color: rgba(255, 255, 255, 0.4); }
+.section--dark .photo { background: rgba(255, 255, 255, 0.08); }

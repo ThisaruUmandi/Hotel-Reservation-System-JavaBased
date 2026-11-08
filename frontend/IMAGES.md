@@ -4,8 +4,9 @@
 `hero/hero.jpg`, `rooms/single.jpg`, `rooms/double.jpg`, `rooms/suite.jpg`, `rooms/single-2.jpg`, `rooms/double-2.jpg`,
 `rooms/suite-2.jpg`, `about/story.jpg`, `about/cta.jpg`.
 
-## Not used right now
-`about/cta.jpg` (the closing banner was removed in the redesign). Keep it or delete it.
+## Where each one appears
+`hero/hero.jpg` home hero. `about/cta.jpg` large photo in the About section. `about/story.jpg` small overlapping photo there.
+`rooms/*.jpg` room cards and the room detail gallery.
 
 ## Still optional
 `hotel/pool.jpg`, `hotel/dining.jpg`, `hotel/garden.jpg` (used by the room detail page and later sections).

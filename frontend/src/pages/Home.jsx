@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { roomsApi } from '../api/rooms';
 import Hero from '../components/home/Hero';
 import Photo from '../components/Photo';
+import Reveal from '../components/Reveal';
 import RoomCard from '../components/RoomCard';
 import Stars from '../components/Stars';
 import { site } from '../config/site';
@@ -40,7 +41,7 @@ export default function Home() {
       <Hero types={types} maxGuests={maxGuests} />
 
       <section className="section" aria-labelledby="about-title">
-        <div className="container about">
+        <Reveal className="container about">
           <div className="about__text">
             <h2 id="about-title">About {site.name}</h2>
             <p>
@@ -48,13 +49,17 @@ export default function Home() {
               choose a room, and pay by card or at the front desk when you arrive.
             </p>
             <p>The price you see is the price you pay for the stay. If your plans change, you can cancel for free until the day before you arrive.</p>
+            <Link to="/rooms" className="text-link">Browse the rooms</Link>
           </div>
-          <Photo src="/images/about/story.jpg" alt={`The beach near ${site.name}`} ratio="4 / 3" label="Photo" />
-        </div>
+          <div className="about__photos">
+            <Photo className="about__photo-main" src="/images/about/cta.jpg" alt={`The pool at ${site.name}`} ratio="4 / 3" label="Photo" />
+            <Photo className="about__photo-inset" src="/images/about/story.jpg" alt={`The beach near ${site.name}`} ratio="4 / 5" label="Photo" />
+          </div>
+        </Reveal>
       </section>
 
-      <section className="section section--tint" aria-labelledby="rooms-title">
-        <div className="container">
+      <section className="section section--dark" aria-labelledby="rooms-title">
+        <Reveal className="container">
           <div className="section-head">
             <h2 id="rooms-title">Our rooms</h2>
             <Link to="/rooms" className="text-link">See all rooms</Link>
@@ -66,12 +71,12 @@ export default function Home() {
               {featured.map((room, i) => <RoomCard key={room.id} room={room} variant={i === 0 ? 'feature' : 'compact'} />)}
             </div>
           )}
-        </div>
+        </Reveal>
       </section>
 
       {reviews.length > 0 && (
         <section className="section" aria-labelledby="reviews-title">
-          <div className="container">
+          <Reveal className="container">
             <h2 id="reviews-title">What guests say</h2>
             <div className="reviews">
               {reviews.map((r) => (
@@ -82,20 +87,23 @@ export default function Home() {
                 </figure>
               ))}
             </div>
-          </div>
+          </Reveal>
         </section>
       )}
 
       <section className={`section${reviews.length > 0 ? ' section--tint' : ''}`} aria-labelledby="facts-title">
-        <div className="container">
-          <h2 id="facts-title" style={{ marginBottom: 'var(--space-5)' }}>Good to know</h2>
+        <Reveal className="container facts-layout">
+          <div>
+            <h2 id="facts-title">Good to know</h2>
+            <p className="muted" style={{ marginTop: 'var(--space-3)', maxWidth: '30ch' }}>The practical details, so there are no surprises when you arrive.</p>
+          </div>
           <dl className="facts">
             {site.facts.map(([label, text]) => (
               <div key={label}><dt>{label}</dt><dd>{text}</dd></div>
             ))}
             <div><dt>Find us</dt><dd>{site.contact.address} · {site.contact.phone} · {site.contact.email}</dd></div>
           </dl>
-        </div>
+        </Reveal>
       </section>
     </>
   );

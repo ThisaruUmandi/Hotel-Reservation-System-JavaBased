@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { roomsApi } from '../api/rooms';
+import Amenity from '../components/Amenity';
 import BookingPanel from '../components/BookingPanel';
 import Photo from '../components/Photo';
 import ReviewList from '../components/ReviewList';
@@ -76,7 +77,7 @@ export default function RoomDetail() {
 
             <h3 className="room-layout__h">What is included</h3>
             <ul className="amenity-list">
-              {room.type.amenities.map((a) => <li key={a}>{a}</li>)}
+              {room.type.amenities.map((a) => <li key={a}><Amenity name={a} />{a}</li>)}
             </ul>
 
             <h3 className="room-layout__h" id="reviews">Guest reviews</h3>

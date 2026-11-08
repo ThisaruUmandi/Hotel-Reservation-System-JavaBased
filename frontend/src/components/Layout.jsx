@@ -8,13 +8,23 @@ export default function Layout() {
   const { user, isStaff, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
+  const [scrolled, setScrolled] = useState(false);
+  const isHome = pathname === '/';
+  const overlay = isHome && !scrolled && !open; // transparent over the photo until the page moves
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => setOpen(false), [pathname]); // close the mobile menu after navigating
 
   return (
     <>
       <a href="#content" className="skip-link">Skip to content</a>
-      <header className={`site-header${pathname === '/' ? ' site-header--overlay' : ''}`}>
+      <header className={`site-header${isHome ? ' site-header--fixed' : ''}${overlay ? ' site-header--overlay' : ''}`}>
         <div className="container site-header__bar">
           <Link to="/" className="brand" aria-label={`${site.name}, home`}><Logo /></Link>
 
