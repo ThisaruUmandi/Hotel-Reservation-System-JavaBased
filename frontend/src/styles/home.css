@@ -14,7 +14,7 @@
 /* A dark overlay keeps the headline readable on any photo */
 .hero::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, rgba(24, 17, 10, 0.74) 0%, rgba(24, 17, 10, 0.28) 55%, rgba(24, 17, 10, 0.42) 100%); }
 .hero__inner { display: flex; flex-direction: column; gap: var(--space-7); }
-.hero h1 { color: #fff; max-width: 12ch; font-size: clamp(3rem, 1.5rem + 6.4vw, 6.25rem); line-height: 0.98; letter-spacing: -0.02em; word-spacing: 0.08em; }
+.hero h1 { color: #fff; max-width: 12ch; font-size: clamp(3rem, 1.5rem + 6.4vw, 6.25rem); line-height: 1.08; letter-spacing: -0.025em; }
 .hero__lead { margin-top: var(--space-5); color: rgba(255, 255, 255, 0.92); font-size: 1.15rem; }
 
 /* The booking bar sits half on the photo, half on the page below */
