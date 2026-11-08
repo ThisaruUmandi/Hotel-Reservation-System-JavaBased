@@ -14,7 +14,7 @@ export default function Layout() {
   return (
     <>
       <a href="#content" className="skip-link">Skip to content</a>
-      <header className="site-header">
+      <header className={`site-header${pathname === '/' ? ' site-header--overlay' : ''}`}>
         <div className="container site-header__bar">
           <Link to="/" className="brand" aria-label={`${site.name}, home`}><Logo /></Link>
 
