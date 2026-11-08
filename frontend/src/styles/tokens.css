@@ -1,11 +1,11 @@
 /* Design tokens: warm, earthy palette inspired by clay, sand, palm and ink. */
 :root {
   /* Sand: page and surface backgrounds */
-  --sand-50: #faf6ef;
+  --sand-50: #ffffff;
   --sand-100: #f3ece0;
   --sand-200: #e8dcc7;
   --sand-300: #d9c9ac;
-  --surface: #fffdf9;
+  --surface: #ffffff;
 
   /* Text */
   --ink: #2b2118;
