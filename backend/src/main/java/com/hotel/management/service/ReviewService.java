@@ -5,7 +5,7 @@ import com.hotel.management.exception.ConflictException;
 import com.hotel.management.exception.ResourceNotFoundException;
 import com.hotel.management.model.Reservation;
 import com.hotel.management.model.Review;
-import com.hotel.management.repository.ReservationRepository;
+import com.hotel.management.security.AuthenticatedUser;
 import com.hotel.management.repository.ReviewRepository;
 import com.hotel.management.repository.RoomRepository;
 import org.springframework.stereotype.Service;
@@ -16,16 +16,15 @@ import java.util.List;
 @Service
 public class ReviewService {
     private final ReviewRepository reviews;
-    private final ReservationRepository reservations;
+    private final ReservationAccess access;
     private final RoomRepository rooms;
 
-    public ReviewService(ReviewRepository reviews, ReservationRepository reservations, RoomRepository rooms) {
-        this.reviews = reviews; this.reservations = reservations; this.rooms = rooms;
+    public ReviewService(ReviewRepository reviews, ReservationAccess access, RoomRepository rooms) {
+        this.reviews = reviews; this.access = access; this.rooms = rooms;
     }
 
-    public Review add(ReviewRequest req) {
-        Reservation reservation = reservations.findById(req.reservationId())
-                .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
+    public Review add(AuthenticatedUser actor, ReviewRequest req) {
+        Reservation reservation = access.load(req.reservationId(), actor);
         if (!reservation.isReviewable(LocalDate.now()))
             throw new ConflictException("You can review a room only after a completed stay");
         if (reviews.existsByReservationId(reservation.getId()))

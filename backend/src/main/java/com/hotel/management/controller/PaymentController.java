@@ -3,9 +3,11 @@ package com.hotel.management.controller;
 import com.hotel.management.dto.PaymentRequest;
 import com.hotel.management.dto.PaymentResponse;
 import com.hotel.management.mapper.EntityMapper;
+import com.hotel.management.security.AuthenticatedUser;
 import com.hotel.management.service.PaymentService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,10 +22,12 @@ public class PaymentController {
 
     @PostMapping("/payments")
     @ResponseStatus(HttpStatus.CREATED)
-    public PaymentResponse pay(@Valid @RequestBody PaymentRequest req) { return mapper.toResponse(service.pay(req)); }
+    public PaymentResponse pay(@Valid @RequestBody PaymentRequest req, @AuthenticationPrincipal AuthenticatedUser actor) {
+        return mapper.toResponse(service.pay(actor, req));
+    }
 
     @GetMapping("/reservations/{id}/payments")
-    public List<PaymentResponse> forReservation(@PathVariable Long id) {
-        return service.forReservation(id).stream().map(mapper::toResponse).toList();
+    public List<PaymentResponse> forReservation(@PathVariable Long id, @AuthenticationPrincipal AuthenticatedUser actor) {
+        return service.forReservation(id, actor).stream().map(mapper::toResponse).toList();
     }
 }

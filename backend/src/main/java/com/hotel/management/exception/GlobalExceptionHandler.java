@@ -20,6 +20,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(404).body(ErrorResponse.of(404, e.getMessage()));
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    ResponseEntity<ErrorResponse> forbidden(ForbiddenException e) {
+        return ResponseEntity.status(403).body(ErrorResponse.of(403, e.getMessage()));
+    }
+
     @ExceptionHandler({ConflictException.class, IllegalStateException.class})
     ResponseEntity<ErrorResponse> conflict(RuntimeException e) {
         return ResponseEntity.status(409).body(ErrorResponse.of(409, e.getMessage()));

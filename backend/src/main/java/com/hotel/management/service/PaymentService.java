@@ -2,10 +2,10 @@ package com.hotel.management.service;
 
 import com.hotel.management.dto.PaymentRequest;
 import com.hotel.management.exception.ConflictException;
-import com.hotel.management.exception.ResourceNotFoundException;
+import com.hotel.management.exception.ForbiddenException;
+import com.hotel.management.security.AuthenticatedUser;
 import com.hotel.management.model.*;
 import com.hotel.management.repository.PaymentRepository;
-import com.hotel.management.repository.ReservationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,16 +15,17 @@ import java.util.List;
 @Service
 public class PaymentService {
     private final PaymentRepository payments;
-    private final ReservationRepository reservations;
+    private final ReservationAccess access;
 
-    public PaymentService(PaymentRepository payments, ReservationRepository reservations) {
-        this.payments = payments; this.reservations = reservations;
+    public PaymentService(PaymentRepository payments, ReservationAccess access) {
+        this.payments = payments; this.access = access;
     }
 
     @Transactional
-    public Payment pay(PaymentRequest req) {
-        Reservation reservation = reservations.findById(req.reservationId())
-                .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
+    public Payment pay(AuthenticatedUser actor, PaymentRequest req) {
+        Reservation reservation = access.load(req.reservationId(), actor);
+        if (req.method() == PaymentMethod.CASH && !actor.isStaff())
+            throw new ForbiddenException("Cash payments are recorded by hotel staff");
         if (reservation.getStatus() != ReservationStatus.CONFIRMED)
             throw new ConflictException("Only confirmed reservations can be paid");
         if (payments.existsByReservationIdAndStatus(reservation.getId(), PaymentStatus.PAID))
@@ -44,8 +45,8 @@ public class PaymentService {
         return payments.save(payment);
     }
 
-    public List<Payment> forReservation(Long reservationId) {
-        if (!reservations.existsById(reservationId)) throw new ResourceNotFoundException("Reservation not found");
+    public List<Payment> forReservation(Long reservationId, AuthenticatedUser actor) {
+        access.load(reservationId, actor);
         return payments.findByReservationId(reservationId);
     }
 
