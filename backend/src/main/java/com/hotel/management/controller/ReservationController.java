@@ -23,7 +23,7 @@ public class ReservationController {
     }
 
     public record BookingRequest(Long roomId, String name, String email, String phone,
-                                 LocalDate checkIn, LocalDate checkOut) {}
+                                 Integer guests, LocalDate checkIn, LocalDate checkOut) {}
 
     @GetMapping("/rooms")
     public List<Room> rooms() { return rooms.findAll(); }
@@ -37,7 +37,8 @@ public class ReservationController {
     @PostMapping("/reservations")
     @ResponseStatus(HttpStatus.CREATED)
     public Reservation create(@RequestBody BookingRequest b) {
-        return service.create(b.roomId(), new Customer(b.name(), b.email(), b.phone()), b.checkIn(), b.checkOut());
+        return service.create(b.roomId(), new Guest(b.name(), b.email(), b.phone()),
+                b.guests() == null ? 1 : b.guests(), b.checkIn(), b.checkOut());
     }
 
     @DeleteMapping("/reservations/{id}")

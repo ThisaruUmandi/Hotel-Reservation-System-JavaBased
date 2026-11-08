@@ -11,15 +11,25 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
     @JsonIgnore
+    @Column(nullable = false)
     private String passwordHash;
-    private String role = "STAFF";
+    @Enumerated(EnumType.STRING) @Column(nullable = false)
+    private Role role = Role.GUEST;
+    @OneToOne
+    private Guest guest;
 
-    public User() {}
+    protected User() {}
+    public User(String username, String passwordHash, Role role) {
+        this.username = username; this.passwordHash = passwordHash; this.role = role;
+    }
+
+    public boolean isStaff() { return role == Role.STAFF || role == Role.ADMIN; }
+
     public Long getId() { return id; }
     public String getUsername() { return username; }
-    public void setUsername(String v) { this.username = v; }
     public String getPasswordHash() { return passwordHash; }
-    public void setPasswordHash(String v) { this.passwordHash = v; }
-    public String getRole() { return role; }
-    public void setRole(String v) { this.role = v; }
+    public Role getRole() { return role; }
+    public void setRole(Role v) { this.role = v; }
+    public Guest getGuest() { return guest; }
+    public void setGuest(Guest v) { this.guest = v; }
 }

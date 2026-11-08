@@ -9,18 +9,33 @@ public class Room {
     private Long id;
     @Column(unique = true, nullable = false)
     private String roomNumber;
-    private String type;
+    @ManyToOne(optional = false)
+    private RoomType roomType;
+    @Column(nullable = false)
     private BigDecimal pricePerNight;
+    private int floor = 1;
+    @Enumerated(EnumType.STRING) @Column(nullable = false)
+    private RoomStatus status = RoomStatus.AVAILABLE;
+    private String imageUrl;
 
-    public Room() {}
-    public Room(String roomNumber, String type, BigDecimal pricePerNight) {
-        this.roomNumber = roomNumber; this.type = type; this.pricePerNight = pricePerNight;
+    protected Room() {}
+    public Room(String roomNumber, RoomType roomType, BigDecimal pricePerNight) {
+        this.roomNumber = roomNumber; this.roomType = roomType; this.pricePerNight = pricePerNight;
     }
+
+    public boolean canHost(int guests) { return guests <= roomType.getCapacity(); }
+    public boolean isBookable() { return status == RoomStatus.AVAILABLE; }
+    public BigDecimal priceFor(long nights) { return pricePerNight.multiply(BigDecimal.valueOf(nights)); }
+
     public Long getId() { return id; }
     public String getRoomNumber() { return roomNumber; }
-    public void setRoomNumber(String v) { this.roomNumber = v; }
-    public String getType() { return type; }
-    public void setType(String v) { this.type = v; }
+    public RoomType getRoomType() { return roomType; }
     public BigDecimal getPricePerNight() { return pricePerNight; }
     public void setPricePerNight(BigDecimal v) { this.pricePerNight = v; }
+    public int getFloor() { return floor; }
+    public void setFloor(int v) { this.floor = v; }
+    public RoomStatus getStatus() { return status; }
+    public void setStatus(RoomStatus v) { this.status = v; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String v) { this.imageUrl = v; }
 }

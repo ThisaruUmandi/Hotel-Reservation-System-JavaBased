@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-    @Query("select count(r) > 0 from Reservation r where r.room.id = :roomId and r.status = 'CONFIRMED' "
+    @Query("select count(r) > 0 from Reservation r where r.room.id = :roomId and r.status = com.hotel.management.model.ReservationStatus.CONFIRMED "
             + "and r.checkIn < :checkOut and r.checkOut > :checkIn")
     boolean existsOverlap(@Param("roomId") Long roomId, @Param("checkIn") LocalDate checkIn,
                           @Param("checkOut") LocalDate checkOut);
