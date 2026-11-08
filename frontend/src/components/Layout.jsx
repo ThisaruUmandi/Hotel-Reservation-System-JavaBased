@@ -50,6 +50,7 @@ export default function Layout() {
 
           <nav id="site-nav" className={`nav${open ? ' is-open' : ''}`} aria-label="Main">
             <ul className="nav__links">
+              <li><NavLink className="nav__link" to="/" end>About Us</NavLink></li>
               <li><NavLink className="nav__link" to="/rooms">Rooms</NavLink></li>
               {user && <li><NavLink className="nav__link" to="/bookings">My bookings</NavLink></li>}
               {isStaff && <li><NavLink className="nav__link" to="/admin">Admin</NavLink></li>}
