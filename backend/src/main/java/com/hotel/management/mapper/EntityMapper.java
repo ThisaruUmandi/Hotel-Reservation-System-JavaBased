@@ -33,7 +33,8 @@ public class EntityMapper {
     }
 
     public UserResponse toResponse(User u) {
-        return new UserResponse(u.getId(), u.getUsername(), u.getRole().name());
+        return new UserResponse(u.getId(), u.getUsername(), u.getRole().name(),
+                u.getGuest() == null ? null : toResponse(u.getGuest()));
     }
 
     public PaymentResponse toResponse(Payment p) {

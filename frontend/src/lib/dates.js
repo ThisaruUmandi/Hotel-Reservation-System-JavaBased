@@ -28,3 +28,6 @@ export function nightsBetween(checkIn, checkOut) {
 
 const dayFormat = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 export const formatDay = (iso) => dayFormat.format(parseISODate(iso));
+
+const longFormat = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+export const formatLong = (iso) => longFormat.format(parseISODate(iso));

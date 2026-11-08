@@ -101,6 +101,20 @@ class SecurityApiTest extends ApiTestBase {
     }
 
     @Test
+    void meIncludesTheSavedGuestProfileAfterTheFirstBooking() throws Exception {
+        User alice = newUser("alice", Role.GUEST);
+        mvc.perform(get("/api/auth/me").header("Authorization", bearer(alice)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.guest").doesNotExist());
+
+        mvc.perform(post("/api/reservations").header("Authorization", bearer(alice)).contentType(MediaType.APPLICATION_JSON)
+                .content(bookingJson(room("102").getId(), 2, in, out))).andExpect(status().isCreated());
+
+        mvc.perform(get("/api/auth/me").header("Authorization", bearer(alice)))
+                .andExpect(jsonPath("$.guest.email").value("test@example.com"))
+                .andExpect(jsonPath("$.guest.name").value("Test Guest"));
+    }
+
+    @Test
     void weakCredentialsAreRejected() throws Exception {
         mvc.perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON)
                 .content("{\"username\":\"ab\",\"password\":\"short\"}"))

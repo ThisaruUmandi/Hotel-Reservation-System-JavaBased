@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addDays, nightsBetween, parseISODate, toISODate } from './dates';
+import { addDays, formatLong, nightsBetween, parseISODate, toISODate } from './dates';
 
 describe('dates', () => {
   it('formats local dates without shifting the day', () => {
@@ -21,5 +21,9 @@ describe('dates', () => {
     expect(nightsBetween('2030-06-10', '2030-06-13')).toBe(3);
     expect(nightsBetween('2030-03-09', '2030-03-11')).toBe(2);
     expect(nightsBetween('2030-10-26', '2030-10-28')).toBe(2);
+  });
+
+  it('writes a date out in full', () => {
+    expect(formatLong('2030-06-10')).toMatch(/^Monday,? 10 June 2030$/); // the comma depends on the browser's locale data
   });
 });

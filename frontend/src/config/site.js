@@ -2,6 +2,7 @@
 export const site = {
   name: 'Palmyra House',
   tagline: 'A small hotel by the water',
+  refPrefix: 'PH', // booking references look like PH00012
   contact: {
     address: '12 Lagoon Road',
     phone: '+94 11 000 0000',

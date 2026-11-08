@@ -35,6 +35,7 @@ export function AuthProvider({ children }) {
       isStaff: user?.role === 'STAFF' || user?.role === 'ADMIN',
       login: async (username, password) => finishLogin(await authApi.login(username, password)),
       register: async (username, password) => finishLogin(await authApi.register(username, password)),
+      refresh: async () => setUser(await authApi.me()), // e.g. after the first booking saves a guest profile
       logout: () => {
         tokenStore.clear();
         setUser(null);
