@@ -25,7 +25,7 @@
   --danger-tint: #f6dcd5;
 
   /* Type */
-  --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
+  --font-display: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-body: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   /* Shape and spacing */

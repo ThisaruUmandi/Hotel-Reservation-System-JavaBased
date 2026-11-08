@@ -173,7 +173,7 @@ Errors always look like `{ "status": 409, "error": "message", "fieldErrors": { }
 - CORS allows only the website's own origin; secrets live in `backend/.env`, which is git-ignored
 
 ## Design notes
-Warm, natural look inspired by boutique hotel sites: Fraunces for the page titles and logo, Figtree for everything else,
+Warm, natural look inspired by boutique hotel sites: Poppins for the page titles and logo, Figtree for everything else,
 a sand, palm-green and clay palette. Layouts work from 360 px phones up. The site is keyboard-friendly and passes an automated
 accessibility audit (axe) on every page. Photos need alternative text and fall back to a neutral frame if missing.
 
