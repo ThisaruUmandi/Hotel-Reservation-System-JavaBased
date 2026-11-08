@@ -13,6 +13,9 @@ public class CashPayment extends Payment {
     }
 
     @Override
+    public PaymentMethod getMethod() { return PaymentMethod.CASH; }
+
+    @Override
     public String describe() { return "Cash received by " + receivedBy; }
 
     public String getReceivedBy() { return receivedBy; }

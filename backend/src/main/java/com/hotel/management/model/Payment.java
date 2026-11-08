@@ -27,6 +27,13 @@ public abstract class Payment {
 
     public void markPaid() { status = PaymentStatus.PAID; paidAt = LocalDateTime.now(); }
 
+    public void refund() {
+        if (status != PaymentStatus.PAID) throw new IllegalStateException("Only paid payments can be refunded");
+        status = PaymentStatus.REFUNDED;
+    }
+
+    public abstract PaymentMethod getMethod();
+
     public abstract String describe();
 
     public Long getId() { return id; }

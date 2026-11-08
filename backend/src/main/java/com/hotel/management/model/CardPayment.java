@@ -15,6 +15,9 @@ public class CardPayment extends Payment {
     }
 
     @Override
+    public PaymentMethod getMethod() { return PaymentMethod.CARD; }
+
+    @Override
     public String describe() { return cardBrand + " ending " + cardLast4; }
 
     public String getCardBrand() { return cardBrand; }

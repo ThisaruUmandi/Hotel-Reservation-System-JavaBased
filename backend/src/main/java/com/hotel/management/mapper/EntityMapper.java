@@ -35,4 +35,13 @@ public class EntityMapper {
     public UserResponse toResponse(User u) {
         return new UserResponse(u.getId(), u.getUsername(), u.getRole().name());
     }
+
+    public PaymentResponse toResponse(Payment p) {
+        return new PaymentResponse(p.getId(), p.getReservation().getId(), p.getMethod().name(), p.describe(),
+                p.getAmount(), p.getStatus().name(), p.getPaidAt());
+    }
+
+    public ReviewResponse toResponse(Review r) {
+        return new ReviewResponse(r.getId(), r.getGuest().getName(), r.getRating(), r.getComment(), r.getCreatedAt());
+    }
 }

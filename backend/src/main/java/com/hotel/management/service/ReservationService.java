@@ -15,9 +15,11 @@ public class ReservationService {
     private final ReservationRepository reservations;
     private final RoomRepository rooms;
     private final GuestRepository guests;
+    private final PaymentRepository payments;
 
-    public ReservationService(ReservationRepository reservations, RoomRepository rooms, GuestRepository guests) {
-        this.reservations = reservations; this.rooms = rooms; this.guests = guests;
+    public ReservationService(ReservationRepository reservations, RoomRepository rooms, GuestRepository guests,
+                              PaymentRepository payments) {
+        this.reservations = reservations; this.rooms = rooms; this.guests = guests; this.payments = payments;
     }
 
     public List<Reservation> findAll() { return reservations.findAll(); }
@@ -40,7 +42,11 @@ public class ReservationService {
     @Transactional
     public Reservation cancel(Long id) {
         Reservation r = get(id);
-        r.cancel();
+        r.cancel(LocalDate.now());
+        // A cancelled booking gets its money back.
+        payments.findByReservationId(id).stream()
+                .filter(p -> p.getStatus() == PaymentStatus.PAID)
+                .forEach(Payment::refund);
         return reservations.save(r);
     }
 }

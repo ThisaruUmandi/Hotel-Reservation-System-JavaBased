@@ -34,7 +34,14 @@ public class Reservation {
 
     public long nights() { return ChronoUnit.DAYS.between(checkIn, checkOut); }
 
-    public void cancel() {
+    /** A guest can review once the stay has ended and it was not cancelled. */
+    public boolean isReviewable(LocalDate today) {
+        return status == ReservationStatus.CONFIRMED && !checkOut.isAfter(today);
+    }
+
+    public void cancel(LocalDate today) {
+        if (!checkIn.isAfter(today))
+            throw new IllegalStateException("A reservation that has already started cannot be cancelled");
         if (status != ReservationStatus.CONFIRMED)
             throw new IllegalStateException("Only confirmed reservations can be cancelled");
         status = ReservationStatus.CANCELLED;

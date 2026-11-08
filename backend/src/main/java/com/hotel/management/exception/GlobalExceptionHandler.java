@@ -3,6 +3,8 @@ package com.hotel.management.exception;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -39,5 +41,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ResponseEntity<ErrorResponse> unreadable(HttpMessageNotReadableException e) {
         return ResponseEntity.badRequest().body(ErrorResponse.of(400, "Malformed JSON or invalid value"));
+    }
+
+    @ExceptionHandler({MissingServletRequestParameterException.class, MethodArgumentTypeMismatchException.class})
+    ResponseEntity<ErrorResponse> badParameter(Exception e) {
+        return ResponseEntity.badRequest().body(ErrorResponse.of(400, "Missing or invalid request parameter"));
     }
 }
